@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+  pg_tursd:
+    image: postgres:13
+    container_name: pg_tursd
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: tursd
+      POSTGRES_PASSWORD: tursd
+      POSTGRES_DB: tursd
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+  pgadmin_tursd:
+    image: dpage/pgadmin4
+    container_name: pgadmin_tursd
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: tursd@mail.com
+      PGADMIN_DEFAULT_PASSWORD: espe
