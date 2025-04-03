@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actividades</title>
+  <!-- Enlace a Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h1 class="mb-4">Actividades</h1>
+
+    <!-- Barra de navegación -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item"><a class="nav-link" href="locales.html">Locales Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="puntos.html">Puntos Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
+      <li class="nav-item"><a class="nav-link active" href="actividades.html">Actividades</a></li>
+      <li class="nav-item"><a class="nav-link" href="localEtiqueta.html">Local Etiqueta</a></li>
+      <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
+      <li class="nav-item"><a class="nav-link" href="duenos.html">Dueños</a></li>
+      <li class="nav-item"><a class="nav-link" href="parroquias.html">Parroquias</a></li>
+      <li class="nav-item"><a class="nav-link" href="horarios.html">Horarios de Atención</a></li>
+    </ul>
+
+    <!-- Contenido de la tabla de Actividades -->
+    <div class="mt-4">
+      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Actividad</button>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Actividad</th>
+            <th>Estado</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaActividades">
+          <!-- Aquí se llenarán los datos dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Enlace a Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Función para cargar los datos de Actividades
+    async function cargarActividades() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/actividades');
+        const actividades = await response.json();
+
+        const tabla = document.getElementById('tablaActividades');
+        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+        actividades.forEach((actividad) => {
+          const fila = `
+            <tr>
+              <td>${actividad.id}</td>
+              <td>${actividad.actividad || 'Sin actividad'}</td>
+              <td>${actividad.estado || 'Sin estado'}</td>
+              <td>${actividad.creado_por || 'Desconocido'}</td>
+              <td>${new Date(actividad.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="editar(${actividad.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminar(${actividad.id})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar las actividades:', error);
+      }
+    }
+
+    // Función para abrir el formulario de agregar (placeholder)
+    function abrirFormulario() {
+      alert('Abrir formulario para agregar una nueva actividad');
+    }
+
+    // Función para editar un registro (placeholder)
+    function editar(id) {
+      alert(`Editar actividad con ID: ${id}`);
+    }
+
+    // Función para eliminar un registro
+    async function eliminar(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar esta actividad?')) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/v1/actividades/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Error al eliminar la actividad');
+
+          alert('Actividad eliminada');
+          cargarActividades(); // Recargar la tabla después de eliminar
+        } catch (error) {
+          console.error('Error al eliminar la actividad:', error);
+        }
+      }
+    }
+
+    // Cargar los datos al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarActividades);
+  </script>
+</body>
+</html>

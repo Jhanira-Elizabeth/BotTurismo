@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Servicios Locales</title>
+  <!-- Enlace a Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h1 class="mb-4">Servicios Locales</h1>
+
+    <!-- Barra de navegación -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item"><a class="nav-link" href="locales.html">Locales Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="puntos.html">Puntos Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
+      <li class="nav-item"><a class="nav-link" href="actividades.html">Actividades</a></li>
+      <li class="nav-item"><a class="nav-link" href="localEtiqueta.html">Local Etiqueta</a></li>
+      <li class="nav-item"><a class="nav-link active" href="servicios.html">Servicios</a></li>
+      <li class="nav-item"><a class="nav-link" href="duenos.html">Dueños</a></li>
+      <li class="nav-item"><a class="nav-link" href="parroquias.html">Parroquias</a></li>
+      <li class="nav-item"><a class="nav-link" href="horarios.html">Horarios de Atención</a></li>
+    </ul>
+
+    <!-- Contenido de la tabla de Servicios Locales -->
+    <div class="mt-4">
+      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Servicio</button>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>ID Local</th>
+            <th>Servicio</th>
+            <th>Precio</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaServicios">
+          <!-- Aquí se llenarán los datos dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Enlace a Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Función para cargar los datos de Servicios Locales
+    async function cargarServicios() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/servicios');
+        if (!response.ok) {
+          throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+        }
+        const servicios = await response.json();
+
+        const tabla = document.getElementById('tablaServicios');
+        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+        if (servicios.length === 0) {
+          tabla.innerHTML = '<tr><td colspan="9" class="text-center">No hay servicios disponibles</td></tr>';
+          return;
+        }
+
+        servicios.forEach((servicio) => {
+          const fila = `
+            <tr>
+              <td>${servicio.id}</td>
+              <td>${servicio.id_local || ''}</td>
+              <td>${servicio.servicio || ''}</td>
+              <td>${servicio.precio || ''}</td>
+              <td>${servicio.tipo || ''}</td>
+              <td>${servicio.estado || ''}</td>
+              <td>${servicio.creado_por || ''}</td>
+              <td>${servicio.fecha_creacion ? new Date(servicio.fecha_creacion).toLocaleDateString() : ''}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="editar(${servicio.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminar(${servicio.id})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar los servicios:', error);
+        const tabla = document.getElementById('tablaServicios');
+        tabla.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar los datos</td></tr>';
+      }
+    }
+
+    // Función para abrir el formulario de agregar (placeholder)
+    function abrirFormulario() {
+      alert('Abrir formulario para agregar un nuevo servicio');
+    }
+
+    // Función para editar un registro (placeholder)
+    function editar(id) {
+      alert(`Editar servicio con ID: ${id}`);
+    }
+
+    // Función para eliminar un registro
+    async function eliminar(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/v1/servicios/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Error al eliminar el servicio');
+
+          alert('Servicio eliminado');
+          cargarServicios(); // Recargar la tabla después de eliminar
+        } catch (error) {
+          console.error('Error al eliminar el servicio:', error);
+          alert('No se pudo eliminar el servicio. Intenta nuevamente.');
+        }
+      }
+    }
+
+    // Cargar los datos al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarServicios);
+  </script>
+</body>
+</html>

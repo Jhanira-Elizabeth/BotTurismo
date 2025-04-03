@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dueños Locales</title>
+  <!-- Enlace a Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h1 class="mb-4">Dueños Locales</h1>
+
+    <!-- Barra de navegación -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item"><a class="nav-link" href="locales.html">Locales Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="puntos.html">Puntos Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
+      <li class="nav-item"><a class="nav-link" href="actividades.html">Actividades</a></li>
+      <li class="nav-item"><a class="nav-link" href="localEtiqueta.html">Local Etiqueta</a></li>
+      <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
+      <li class="nav-item"><a class="nav-link active" href="duenos.html">Dueños</a></li>
+      <li class="nav-item"><a class="nav-link" href="parroquias.html">Parroquias</a></li>
+      <li class="nav-item"><a class="nav-link" href="horarios.html">Horarios de Atención</a></li>
+    </ul>
+
+    <!-- Contenido de la tabla de Dueños Locales -->
+    <div class="mt-4">
+      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Dueño</button>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Cédula</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaDuenos">
+          <!-- Aquí se llenarán los datos dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Enlace a Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Función para cargar los datos de Dueños Locales
+    async function cargarDuenos() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/duenos');
+        const duenos = await response.json();
+
+        const tabla = document.getElementById('tablaDuenos');
+        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+        duenos.forEach((dueno) => {
+          const fila = `
+            <tr>
+              <td>${dueno.id}</td>
+              <td>${dueno.nombre || 'Sin nombre'}</td>
+              <td>${dueno.apellido || 'Sin apellido'}</td>
+              <td>${dueno.cedula || 'Sin cédula'}</td>
+              <td>${dueno.telefono || 'Sin teléfono'}</td>
+              <td>${dueno.email || 'Sin email'}</td>
+              <td>${dueno.estado || 'Sin estado'}</td>
+              <td>${dueno.creado_por || 'Desconocido'}</td>
+              <td>${new Date(dueno.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="editar(${dueno.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminar(${dueno.id})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar los dueños:', error);
+      }
+    }
+
+    // Función para abrir el formulario de agregar (placeholder)
+    function abrirFormulario() {
+      alert('Abrir formulario para agregar un nuevo dueño');
+    }
+
+    // Función para editar un registro (placeholder)
+    function editar(id) {
+      alert(`Editar dueño con ID: ${id}`);
+    }
+
+    // Función para eliminar un registro
+    async function eliminar(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar este dueño?')) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/v1/duenos/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Error al eliminar el dueño');
+
+          alert('Dueño eliminado');
+          cargarDuenos(); // Recargar la tabla después de eliminar
+        } catch (error) {
+          console.error('Error al eliminar el dueño:', error);
+        }
+      }
+    }
+
+    // Cargar los datos al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarDuenos);
+  </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puntos Turísticos</title>
+  <!-- Enlace a Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h1 class="mb-4">Puntos Turísticos</h1>
+
+    <!-- Barra de navegación -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item"><a class="nav-link" href="locales.html">Locales Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link active" href="puntos.html">Puntos Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
+      <li class="nav-item"><a class="nav-link" href="actividades.html">Actividades</a></li>
+      <li class="nav-item"><a class="nav-link" href="localEtiqueta.html">Local Etiqueta</a></li>
+      <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
+      <li class="nav-item"><a class="nav-link" href="duenos.html">Dueños</a></li>
+      <li class="nav-item"><a class="nav-link" href="parroquias.html">Parroquias</a></li>
+      <li class="nav-item"><a class="nav-link" href="horarios.html">Horarios de Atención</a></li>
+    </ul>
+
+    <!-- Contenido de la tabla de Puntos Turísticos -->
+    <div class="mt-4">
+      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Punto</button>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPuntos">
+          <!-- Aquí se llenarán los datos dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Enlace a Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Función para cargar los datos de Puntos Turísticos
+    async function cargarPuntos() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/puntos');
+        const puntos = await response.json();
+
+        const tabla = document.getElementById('tablaPuntos');
+        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+        puntos.forEach((punto) => {
+          const fila = `
+            <tr>
+              <td>${punto.id}</td>
+              <td>${punto.nombre || 'Sin nombre'}</td>
+              <td>${punto.descripcion || 'Sin descripción'}</td>
+              <td>${punto.estado || 'Sin estado'}</td>
+              <td>${punto.creado_por || 'Desconocido'}</td>
+              <td>${new Date(punto.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="editar(${punto.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminar(${punto.id})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar los puntos turísticos:', error);
+      }
+    }
+
+    // Función para abrir el formulario de agregar (placeholder)
+    function abrirFormulario() {
+      alert('Abrir formulario para agregar un nuevo punto turístico');
+    }
+
+    // Función para editar un registro (placeholder)
+    function editar(id) {
+      alert(`Editar punto turístico con ID: ${id}`);
+    }
+
+    // Función para eliminar un registro
+    async function eliminar(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar este punto turístico?')) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/v1/puntos/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Error al eliminar el punto turístico');
+
+          alert('Punto turístico eliminado');
+          cargarPuntos(); // Recargar la tabla después de eliminar
+        } catch (error) {
+          console.error('Error al eliminar el punto turístico:', error);
+        }
+      }
+    }
+
+    // Cargar los datos al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarPuntos);
+  </script>
+</body>
+</html>

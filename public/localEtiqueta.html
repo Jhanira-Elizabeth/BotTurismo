@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Etiqueta</title>
+  <!-- Enlace a Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h1 class="mb-4">Local Etiqueta</h1>
+
+    <!-- Barra de navegación -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item"><a class="nav-link" href="locales.html">Locales Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="puntos.html">Puntos Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
+      <li class="nav-item"><a class="nav-link" href="actividades.html">Actividades</a></li>
+      <li class="nav-item"><a class="nav-link active" href="localEtiqueta.html">Local Etiqueta</a></li>
+      <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
+      <li class="nav-item"><a class="nav-link" href="duenos.html">Dueños</a></li>
+      <li class="nav-item"><a class="nav-link" href="parroquias.html">Parroquias</a></li>
+      <li class="nav-item"><a class="nav-link" href="horarios.html">Horarios de Atención</a></li>
+    </ul>
+
+    <!-- Contenido de la tabla de Local Etiqueta -->
+    <div class="mt-4">
+      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Relación</button>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID Local</th>
+            <th>ID Etiqueta</th>
+            <th>Estado</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaLocalEtiqueta">
+          <!-- Aquí se llenarán los datos dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Enlace a Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Función para cargar los datos de Local Etiqueta
+    async function cargarLocalEtiqueta() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/local-etiqueta');
+        if (!response.ok) {
+          throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+        }
+        const relaciones = await response.json();
+        console.log('Datos recibidos:', relaciones); // Verifica los datos en la consola
+
+        const tabla = document.getElementById('tablaLocalEtiqueta');
+        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+        if (relaciones.length === 0) {
+          tabla.innerHTML = '<tr><td colspan="6" class="text-center">No hay relaciones disponibles</td></tr>';
+          return;
+        }
+
+        relaciones.forEach((relacion) => {
+          const fila = `
+            <tr>
+              <td>${relacion.id_local !== undefined ? relacion.id_local.toString() : 'Sin ID Local'}</td>
+              <td>${relacion.id_etiqueta !== undefined ? relacion.id_etiqueta.toString() : 'Sin ID Etiqueta'}</td>
+              <td>${relacion.estado || 'Sin estado'}</td>
+              <td>${relacion.creado_por || 'Desconocido'}</td>
+              <td>${relacion.fecha_creacion ? new Date(relacion.fecha_creacion).toLocaleDateString() : 'Sin fecha'}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="editar(${relacion.id_local}, ${relacion.id_etiqueta})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminar(${relacion.id_local}, ${relacion.id_etiqueta})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar las relaciones Local Etiqueta:', error);
+        const tabla = document.getElementById('tablaLocalEtiqueta');
+        tabla.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar los datos</td></tr>';
+      }
+    }
+
+    // Función para abrir el formulario de agregar (placeholder)
+    function abrirFormulario() {
+      alert('Abrir formulario para agregar una nueva relación Local Etiqueta');
+    }
+
+    // Función para editar un registro (placeholder)
+    function editar(idLocal, idEtiqueta) {
+      alert(`Editar relación Local Etiqueta con ID Local: ${idLocal} e ID Etiqueta: ${idEtiqueta}`);
+    }
+
+    // Función para eliminar un registro
+    async function eliminar(idLocal, idEtiqueta) {
+      if (confirm(`¿Estás seguro de que deseas eliminar la relación con ID Local: ${idLocal} e ID Etiqueta: ${idEtiqueta}?`)) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/v1/local-etiqueta/${idLocal}/${idEtiqueta}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Error al eliminar la relación Local Etiqueta');
+
+          alert('Relación eliminada');
+          cargarLocalEtiqueta(); // Recargar la tabla después de eliminar
+        } catch (error) {
+          console.error('Error al eliminar la relación Local Etiqueta:', error);
+        }
+      }
+    }
+
+    // Cargar los datos al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarLocalEtiqueta);
+  </script>
+</body>
+</html>

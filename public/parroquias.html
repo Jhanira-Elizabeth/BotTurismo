@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parroquias</title>
+  <!-- Enlace a Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h1 class="mb-4">Parroquias</h1>
+
+    <!-- Barra de navegación -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item"><a class="nav-link" href="locales.html">Locales Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="puntos.html">Puntos Turísticos</a></li>
+      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
+      <li class="nav-item"><a class="nav-link" href="actividades.html">Actividades</a></li>
+      <li class="nav-item"><a class="nav-link" href="localEtiqueta.html">Local Etiqueta</a></li>
+      <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
+      <li class="nav-item"><a class="nav-link" href="duenos.html">Dueños</a></li>
+      <li class="nav-item"><a class="nav-link active" href="parroquias.html">Parroquias</a></li>
+      <li class="nav-item"><a class="nav-link" href="horarios.html">Horarios de Atención</a></li>
+    </ul>
+
+    <!-- Contenido de la tabla de Parroquias -->
+    <div class="mt-4">
+      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Parroquia</button>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Fecha Fundación</th>
+            <th>Población</th>
+            <th>Clima</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaParroquias">
+          <!-- Aquí se llenarán los datos dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Enlace a Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Función para cargar los datos de Parroquias
+    async function cargarParroquias() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/parroquias');
+        const parroquias = await response.json();
+
+        const tabla = document.getElementById('tablaParroquias');
+        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+        parroquias.forEach((parroquia) => {
+          const fila = `
+            <tr>
+              <td>${parroquia.id}</td>
+              <td>${parroquia.nombre || 'Sin nombre'}</td>
+              <td>${parroquia.fecha_fundacion || 'Sin fecha'}</td>
+              <td>${parroquia.poblacion || 'Sin población'}</td>
+              <td>${parroquia.temperatura_promedio || 'Sin clima'}</td>
+              <td>${parroquia.descripcion || 'Sin descripción'}</td>
+              <td>${parroquia.estado || 'Sin estado'}</td>
+              <td>${parroquia.creado_por || 'Desconocido'}</td>
+              <td>${new Date(parroquia.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="editar(${parroquia.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminar(${parroquia.id})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar las parroquias:', error);
+      }
+    }
+
+    // Función para abrir el formulario de agregar (placeholder)
+    function abrirFormulario() {
+      alert('Abrir formulario para agregar una nueva parroquia');
+    }
+
+    // Función para editar un registro (placeholder)
+    function editar(id) {
+      alert(`Editar parroquia con ID: ${id}`);
+    }
+
+    // Función para eliminar un registro
+    async function eliminar(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar esta parroquia?')) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/v1/parroquias/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Error al eliminar la parroquia');
+
+          alert('Parroquia eliminada');
+          cargarParroquias(); // Recargar la tabla después de eliminar
+        } catch (error) {
+          console.error('Error al eliminar la parroquia:', error);
+        }
+      }
+    }
+
+    // Cargar los datos al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarParroquias);
+  </script>
+</body>
+</html>
