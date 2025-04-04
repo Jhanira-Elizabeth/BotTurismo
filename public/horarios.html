@@ -143,7 +143,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="sidebar-title">
-        <i class="fas fa-tags"></i>
+        <i class="fas fa-clock"></i>
         <span>TurSD</span>
       </div>
       <ul class="nav flex-column">
@@ -158,18 +158,13 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="etiquetas.html">
-            <i class="fas fa-tags"></i> Etiquetas Turísticas
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="localEtiqueta.html">
-            <i class="fas fa-link"></i> Local Etiqueta
-          </a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="actividades.html">
             <i class="fas fa-hiking"></i> Actividades
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="etiquetas.html">
+            <i class="fas fa-tags"></i> Etiquetas Turísticas
           </a>
         </li>
         <li class="nav-item">
@@ -287,11 +282,136 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
+  <!-- Enlace a Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Funciones de JavaScript (cargarHorarios, abrirFormularioCrear, abrirFormularioEditar, guardarHorario, eliminarHorario)
-    // Se mantienen igual que en el archivo original
+    // Función para cargar los horarios desde el backend
+    async function cargarHorarios() {
+      try {
+        const response = await fetch('https://tursd.onrender.com/api/v1/horarios');
+        const horarios = await response.json();
+
+        // Ordenar los horarios por ID
+        horarios.sort((a, b) => a.id - b.id);
+
+        const tabla = document.getElementById('tablaHorarios');
+        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+        horarios.forEach((horario) => {
+          const fila = `
+            <tr>
+              <td>${horario.id}</td>
+              <td>${horario.id_local || 'Sin ID Local'}</td>
+              <td>${horario.dia_semana || 'Sin día'}</td>
+              <td>${horario.hora_inicio || 'Sin hora de inicio'}</td>
+              <td>${horario.hora_fin || 'Sin hora de fin'}</td>
+              <td>${horario.estado || 'Sin estado'}</td>
+              <td>${horario.creado_por || 'Desconocido'}</td>
+              <td>${new Date(horario.fecha_creacion).toLocaleString() || 'Sin fecha'}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${horario.id}, ${horario.id_local}, '${horario.dia_semana}', '${horario.hora_inicio}', '${horario.hora_fin}', '${horario.estado}', '${horario.creado_por}', '${horario.editado_por}', '${horario.fecha_creacion}', '${horario.fecha_ultima_edicion}')">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarHorario(${horario.id})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar los horarios:', error);
+      }
+    }
+
+    // Función para abrir el formulario modal para crear un horario
+    function abrirFormularioCrear() {
+      document.getElementById('formHorario').reset();
+      document.getElementById('modalHorarioLabel').textContent = 'Crear Horario';
+      document.getElementById('horarioId').value = '';
+      document.getElementById('horarioFechaCreacion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      document.getElementById('horarioFechaUltimaEdicion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      const modal = new bootstrap.Modal(document.getElementById('modalHorario'));
+      modal.show();
+    }
+
+    // Función para abrir el formulario modal para editar un horario
+    function abrirFormularioEditar(id, id_local, dia_semana, hora_inicio, hora_fin, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion) {
+      document.getElementById('modalHorarioLabel').textContent = 'Editar Horario';
+      document.getElementById('horarioId').value = id;
+      document.getElementById('horarioIdLocal').value = id_local;
+      document.getElementById('horarioDiaSemana').value = dia_semana;
+      document.getElementById('horarioHoraInicio').value = hora_inicio.slice(0, 5); // Asegurar formato HH:mm
+      document.getElementById('horarioHoraFin').value = hora_fin.slice(0, 5); // Asegurar formato HH:mm
+      document.getElementById('horarioEstado').value = estado;
+      document.getElementById('horarioCreador').value = creado_por;
+      document.getElementById('horarioEditor').value = editado_por;
+      document.getElementById('horarioFechaCreacion').value = new Date(fecha_creacion).toISOString().slice(0, 16);
+      document.getElementById('horarioFechaUltimaEdicion').value = new Date(fecha_ultima_edicion).toISOString().slice(0, 16);
+      const modal = new bootstrap.Modal(document.getElementById('modalHorario'));
+      modal.show();
+    }
+
+    // Función para manejar el envío del formulario
+    document.getElementById('formHorario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('horarioId').value;
+      const id_local = document.getElementById('horarioIdLocal').value;
+      const dia_semana = document.getElementById('horarioDiaSemana').value;
+      const hora_inicio = document.getElementById('horarioHoraInicio').value.slice(0, 5); // Asegurar formato HH:mm
+      const hora_fin = document.getElementById('horarioHoraFin').value.slice(0, 5); // Asegurar formato HH:mm
+      const estado = document.getElementById('horarioEstado').value;
+      const creado_por = document.getElementById('horarioCreador').value;
+      const editado_por = document.getElementById('horarioEditor').value || null;
+      const fecha_creacion = new Date(document.getElementById('horarioFechaCreacion').value).toISOString();
+      const fecha_ultima_edicion = new Date(document.getElementById('horarioFechaUltimaEdicion').value).toISOString();
+
+      const data = id
+        ? { id_local, dia_semana, hora_inicio, hora_fin, estado, editado_por, fecha_ultima_edicion } // PATCH payload
+        : { id_local, dia_semana, hora_inicio, hora_fin, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion }; // POST payload
+
+      const url = id
+        ? `https://tursd.onrender.com/api/v1/horarios/${id}` // Edición
+        : 'https://tursd.onrender.com/api/v1/horarios'; // Creación
+      const method = id ? 'PATCH' : 'POST';
+
+      try {
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al guardar el horario: ${errorText}`);
+        }
+
+        alert(id ? 'Horario actualizado correctamente' : 'Horario creado correctamente');
+        location.reload(); // Recargar la página para actualizar los datos
+      } catch (error) {
+        console.error('Error al guardar el horario:', error);
+      }
+    });
+
+    // Función para eliminar un horario
+    async function eliminarHorario(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar este horario?')) {
+        try {
+          const response = await fetch(`https://tursd.onrender.com/api/v1/horarios/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Error al eliminar el horario');
+
+          alert('Horario eliminado');
+          location.reload(); // Recargar la página para actualizar los datos
+        } catch (error) {
+          console.error('Error al eliminar el horario:', error);
+        }
+      }
+    }
+
+    // Cargar los horarios al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarHorarios);
   </script>
 </body>
 </html>
