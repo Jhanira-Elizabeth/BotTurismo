@@ -10,7 +10,7 @@ const cors = require('cors'); // Importar cors para habilitar CORS
 app.use(express.json());
 
 const corsOptions = {
-  origin: 'http://localhost:61807', // Permite solo solicitudes desde este origen
+  origin: 'https://tursd.onrender.com', // Permite solo solicitudes desde este origen
   methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Los métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
 };
