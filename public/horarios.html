@@ -24,38 +24,98 @@
       <li class="nav-item"><a class="nav-link active" href="horarios.html">Horarios de Atención</a></li>
     </ul>
 
-    <!-- Contenido de la tabla de Horarios -->
-    <div class="mt-4">
-      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Horario</button>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>ID Local</th>
-            <th>Día</th>
-            <th>Hora Inicio</th>
-            <th>Hora Fin</th>
-            <th>Estado</th>
-            <th>Creado Por</th>
-            <th>Fecha Creación</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tablaHorarios">
-          <!-- Aquí se llenarán los datos dinámicamente -->
-        </tbody>
-      </table>
+    <!-- Botón para abrir el formulario modal -->
+    <button class="btn btn-success mb-3" onclick="abrirFormularioCrear()">Agregar Horario</button>
+
+    <!-- Tabla para mostrar los horarios -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>ID Local</th>
+          <th>Día</th>
+          <th>Hora Inicio</th>
+          <th>Hora Fin</th>
+          <th>Estado</th>
+          <th>Creado Por</th>
+          <th>Fecha Creación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaHorarios">
+        <!-- Aquí se llenarán los datos dinámicamente -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal para Crear/Editar Horario -->
+  <div class="modal fade" id="modalHorario" tabindex="-1" aria-labelledby="modalHorarioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalHorarioLabel">Crear/Editar Horario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formHorario">
+            <input type="hidden" id="horarioId">
+            <div class="mb-3">
+              <label for="horarioIdLocal" class="form-label">ID Local</label>
+              <input type="number" class="form-control" id="horarioIdLocal" placeholder="Ejemplo: 2" required>
+            </div>
+            <div class="mb-3">
+              <label for="horarioDiaSemana" class="form-label">Día de la Semana</label>
+              <input type="text" class="form-control" id="horarioDiaSemana" placeholder="Ejemplo: martes" required>
+            </div>
+            <div class="mb-3">
+              <label for="horarioHoraInicio" class="form-label">Hora Inicio</label>
+              <input type="time" class="form-control" id="horarioHoraInicio" required>
+            </div>
+            <div class="mb-3">
+              <label for="horarioHoraFin" class="form-label">Hora Fin</label>
+              <input type="time" class="form-control" id="horarioHoraFin" required>
+            </div>
+            <div class="mb-3">
+              <label for="horarioEstado" class="form-label">Estado</label>
+              <select class="form-control" id="horarioEstado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="horarioCreador" class="form-label">Creado Por</label>
+              <input type="text" class="form-control" id="horarioCreador" placeholder="Ejemplo: Jhan" required>
+            </div>
+            <div class="mb-3">
+              <label for="horarioEditor" class="form-label">Editado Por</label>
+              <input type="text" class="form-control" id="horarioEditor" placeholder="Ejemplo: Admin">
+            </div>
+            <div class="mb-3">
+              <label for="horarioFechaCreacion" class="form-label">Fecha Creación</label>
+              <input type="datetime-local" class="form-control" id="horarioFechaCreacion" required>
+            </div>
+            <div class="mb-3">
+              <label for="horarioFechaUltimaEdicion" class="form-label">Fecha Última Edición</label>
+              <input type="datetime-local" class="form-control" id="horarioFechaUltimaEdicion" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Enlace a Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Función para cargar los datos de Horarios
+    // Función para cargar los horarios desde el backend
     async function cargarHorarios() {
       try {
         const response = await fetch('http://localhost:3000/api/v1/horarios');
         const horarios = await response.json();
+
+        // Ordenar los horarios por ID
+        horarios.sort((a, b) => a.id - b.id);
 
         const tabla = document.getElementById('tablaHorarios');
         tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
@@ -65,15 +125,15 @@
             <tr>
               <td>${horario.id}</td>
               <td>${horario.id_local || 'Sin ID Local'}</td>
-              <td>${horario.dia_semana || 'Sin día'}</td> <!-- Cambiado a dia_semana -->
+              <td>${horario.dia_semana || 'Sin día'}</td>
               <td>${horario.hora_inicio || 'Sin hora de inicio'}</td>
               <td>${horario.hora_fin || 'Sin hora de fin'}</td>
               <td>${horario.estado || 'Sin estado'}</td>
               <td>${horario.creado_por || 'Desconocido'}</td>
-              <td>${new Date(horario.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+              <td>${new Date(horario.fecha_creacion).toLocaleString() || 'Sin fecha'}</td>
               <td>
-                <button class="btn btn-primary btn-sm" onclick="editar(${horario.id})">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="eliminar(${horario.id})">Eliminar</button>
+                <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${horario.id}, ${horario.id_local}, '${horario.dia_semana}', '${horario.hora_inicio}', '${horario.hora_fin}', '${horario.estado}', '${horario.creado_por}', '${horario.editado_por}', '${horario.fecha_creacion}', '${horario.fecha_ultima_edicion}')">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarHorario(${horario.id})">Eliminar</button>
               </td>
             </tr>
           `;
@@ -84,18 +144,79 @@
       }
     }
 
-    // Función para abrir el formulario de agregar (placeholder)
-    function abrirFormulario() {
-      alert('Abrir formulario para agregar un nuevo horario');
+    // Función para abrir el formulario modal para crear un horario
+    function abrirFormularioCrear() {
+      document.getElementById('formHorario').reset();
+      document.getElementById('modalHorarioLabel').textContent = 'Crear Horario';
+      document.getElementById('horarioId').value = '';
+      document.getElementById('horarioFechaCreacion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      document.getElementById('horarioFechaUltimaEdicion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      const modal = new bootstrap.Modal(document.getElementById('modalHorario'));
+      modal.show();
     }
 
-    // Función para editar un registro (placeholder)
-    function editar(id) {
-      alert(`Editar horario con ID: ${id}`);
+    // Función para abrir el formulario modal para editar un horario
+    function abrirFormularioEditar(id, id_local, dia_semana, hora_inicio, hora_fin, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion) {
+      document.getElementById('modalHorarioLabel').textContent = 'Editar Horario';
+      document.getElementById('horarioId').value = id;
+      document.getElementById('horarioIdLocal').value = id_local;
+      document.getElementById('horarioDiaSemana').value = dia_semana;
+      document.getElementById('horarioHoraInicio').value = hora_inicio.slice(0, 5); // Asegurar formato HH:mm
+      document.getElementById('horarioHoraFin').value = hora_fin.slice(0, 5); // Asegurar formato HH:mm
+      document.getElementById('horarioEstado').value = estado;
+      document.getElementById('horarioCreador').value = creado_por;
+      document.getElementById('horarioEditor').value = editado_por;
+      document.getElementById('horarioFechaCreacion').value = new Date(fecha_creacion).toISOString().slice(0, 16);
+      document.getElementById('horarioFechaUltimaEdicion').value = new Date(fecha_ultima_edicion).toISOString().slice(0, 16);
+      const modal = new bootstrap.Modal(document.getElementById('modalHorario'));
+      modal.show();
     }
 
-    // Función para eliminar un registro
-    async function eliminar(id) {
+    // Función para manejar el envío del formulario
+    document.getElementById('formHorario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('horarioId').value;
+      const id_local = document.getElementById('horarioIdLocal').value;
+      const dia_semana = document.getElementById('horarioDiaSemana').value;
+      const hora_inicio = document.getElementById('horarioHoraInicio').value.slice(0, 5); // Asegurar formato HH:mm
+      const hora_fin = document.getElementById('horarioHoraFin').value.slice(0, 5); // Asegurar formato HH:mm
+      const estado = document.getElementById('horarioEstado').value;
+      const creado_por = document.getElementById('horarioCreador').value;
+      const editado_por = document.getElementById('horarioEditor').value || null;
+      const fecha_creacion = new Date(document.getElementById('horarioFechaCreacion').value).toISOString();
+      const fecha_ultima_edicion = new Date(document.getElementById('horarioFechaUltimaEdicion').value).toISOString();
+
+      const data = id
+        ? { id_local, dia_semana, hora_inicio, hora_fin, estado, editado_por, fecha_ultima_edicion } // PATCH payload
+        : { id_local, dia_semana, hora_inicio, hora_fin, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion }; // POST payload
+
+      const url = id
+        ? `http://localhost:3000/api/v1/horarios/${id}` // Edición
+        : 'http://localhost:3000/api/v1/horarios'; // Creación
+      const method = id ? 'PATCH' : 'POST';
+
+      try {
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al guardar el horario: ${errorText}`);
+        }
+
+        alert(id ? 'Horario actualizado correctamente' : 'Horario creado correctamente');
+        location.reload(); // Recargar la página para actualizar los datos
+      } catch (error) {
+        console.error('Error al guardar el horario:', error);
+      }
+    });
+
+    // Función para eliminar un horario
+    async function eliminarHorario(id) {
       if (confirm('¿Estás seguro de que deseas eliminar este horario?')) {
         try {
           const response = await fetch(`http://localhost:3000/api/v1/horarios/${id}`, {
@@ -105,14 +226,14 @@
           if (!response.ok) throw new Error('Error al eliminar el horario');
 
           alert('Horario eliminado');
-          cargarHorarios(); // Recargar la tabla después de eliminar
+          location.reload(); // Recargar la página para actualizar los datos
         } catch (error) {
           console.error('Error al eliminar el horario:', error);
         }
       }
     }
 
-    // Cargar los datos al cargar la página
+    // Cargar los horarios al cargar la página
     document.addEventListener('DOMContentLoaded', cargarHorarios);
   </script>
 </body>

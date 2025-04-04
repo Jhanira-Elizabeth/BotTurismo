@@ -26,7 +26,7 @@
 
     <!-- Contenido de la tabla de Dueños Locales -->
     <div class="mt-4">
-      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Dueño</button>
+      <button class="btn btn-success mb-3" onclick="abrirFormularioCrear()">Agregar Dueño</button>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -38,7 +38,9 @@
             <th>Email</th>
             <th>Estado</th>
             <th>Creado Por</th>
+            <th>Editado Por</th>
             <th>Fecha Creación</th>
+            <th>Fecha Última Edición</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -46,6 +48,71 @@
           <!-- Aquí se llenarán los datos dinámicamente -->
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Modal para Crear/Editar Dueño -->
+  <div class="modal fade" id="modalDueno" tabindex="-1" aria-labelledby="modalDuenoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDuenoLabel">Agregar Dueño</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formDueno">
+            <input type="hidden" id="duenoId">
+            <div class="mb-3">
+              <label for="duenoNombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="duenoNombre" placeholder="Ejemplo: Pedro" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoApellido" class="form-label">Apellido</label>
+              <input type="text" class="form-control" id="duenoApellido" placeholder="Ejemplo: Pérez" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoCedula" class="form-label">Cédula</label>
+              <input type="text" class="form-control" id="duenoCedula" placeholder="Ejemplo: 1204145443" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoTelefono" class="form-label">Teléfono</label>
+              <input type="text" class="form-control" id="duenoTelefono" placeholder="Ejemplo: 0935456624" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="duenoEmail" placeholder="Ejemplo: pedro12@gmail.com" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoContrasena" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="duenoContrasena" placeholder="Ingrese la contraseña" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoEstado" class="form-label">Estado</label>
+              <select class="form-control" id="duenoEstado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="duenoCreadoPor" class="form-label">Creado Por</label>
+              <input type="text" class="form-control" id="duenoCreadoPor" placeholder="Ejemplo: Admin" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoEditadoPor" class="form-label">Editado Por</label>
+              <input type="text" class="form-control" id="duenoEditadoPor" placeholder="Ejemplo: Admin" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoFechaCreacion" class="form-label">Fecha Creación</label>
+              <input type="datetime-local" class="form-control" id="duenoFechaCreacion" required>
+            </div>
+            <div class="mb-3">
+              <label for="duenoFechaUltimaEdicion" class="form-label">Fecha Última Edición</label>
+              <input type="datetime-local" class="form-control" id="duenoFechaUltimaEdicion" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -72,9 +139,11 @@
               <td>${dueno.email || 'Sin email'}</td>
               <td>${dueno.estado || 'Sin estado'}</td>
               <td>${dueno.creado_por || 'Desconocido'}</td>
-              <td>${new Date(dueno.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+              <td>${dueno.editado_por || 'Desconocido'}</td>
+              <td>${new Date(dueno.fecha_creacion).toLocaleString() || 'Sin fecha'}</td>
+              <td>${new Date(dueno.fecha_ultima_edicion).toLocaleString() || 'Sin fecha'}</td>
               <td>
-                <button class="btn btn-primary btn-sm" onclick="editar(${dueno.id})">Editar</button>
+                <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${dueno.id}, '${dueno.nombre}', '${dueno.apellido}', '${dueno.cedula}', '${dueno.telefono}', '${dueno.email}', '${dueno.estado}', '${dueno.creado_por}', '${dueno.editado_por}', '${dueno.fecha_creacion}', '${dueno.fecha_ultima_edicion}')">Editar</button>
                 <button class="btn btn-danger btn-sm" onclick="eliminar(${dueno.id})">Eliminar</button>
               </td>
             </tr>
@@ -86,15 +155,82 @@
       }
     }
 
-    // Función para abrir el formulario de agregar (placeholder)
-    function abrirFormulario() {
-      alert('Abrir formulario para agregar un nuevo dueño');
+    // Función para abrir el formulario de crear
+    function abrirFormularioCrear() {
+      document.getElementById('formDueno').reset();
+      document.getElementById('modalDuenoLabel').textContent = 'Agregar Dueño';
+      document.getElementById('duenoId').value = '';
+      document.getElementById('duenoFechaCreacion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      document.getElementById('duenoFechaUltimaEdicion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      const modal = new bootstrap.Modal(document.getElementById('modalDueno'));
+      modal.show();
     }
 
-    // Función para editar un registro (placeholder)
-    function editar(id) {
-      alert(`Editar dueño con ID: ${id}`);
+    // Función para abrir el formulario de editar
+    function abrirFormularioEditar(id, nombre, apellido, cedula, telefono, email, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion) {
+      document.getElementById('modalDuenoLabel').textContent = 'Editar Dueño';
+      document.getElementById('duenoId').value = id;
+      document.getElementById('duenoNombre').value = nombre;
+      document.getElementById('duenoApellido').value = apellido;
+      document.getElementById('duenoCedula').value = cedula;
+      document.getElementById('duenoTelefono').value = telefono;
+      document.getElementById('duenoEmail').value = email;
+      document.getElementById('duenoEstado').value = estado;
+      document.getElementById('duenoCreadoPor').value = creado_por;
+      document.getElementById('duenoEditadoPor').value = editado_por;
+      document.getElementById('duenoFechaCreacion').value = new Date(fecha_creacion).toISOString().slice(0, 16);
+      document.getElementById('duenoFechaUltimaEdicion').value = new Date(fecha_ultima_edicion).toISOString().slice(0, 16);
+      const modal = new bootstrap.Modal(document.getElementById('modalDueno'));
+      modal.show();
     }
+
+    // Función para manejar el envío del formulario (crear o editar)
+    document.getElementById('formDueno').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('duenoId').value; // ID del dueño (vacío si es creación)
+      const nombre = document.getElementById('duenoNombre').value;
+      const apellido = document.getElementById('duenoApellido').value;
+      const cedula = document.getElementById('duenoCedula').value;
+      const telefono = document.getElementById('duenoTelefono').value;
+      const email = document.getElementById('duenoEmail').value;
+      const contrasena = document.getElementById('duenoContrasena').value;
+      const estado = document.getElementById('duenoEstado').value;
+      const creado_por = document.getElementById('duenoCreadoPor').value;
+      const editado_por = document.getElementById('duenoEditadoPor').value;
+      const fecha_creacion = document.getElementById('duenoFechaCreacion').value;
+      const fecha_ultima_edicion = document.getElementById('duenoFechaUltimaEdicion').value;
+
+      // Define los datos a enviar
+      const data = { nombre, apellido, cedula, telefono, email, contrasena, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion };
+
+      // Define la URL y el método según si es creación o edición
+      const url = id
+        ? `http://localhost:3000/api/v1/duenos/${id}` // Edición
+        : 'http://localhost:3000/api/v1/duenos'; // Creación
+      const method = id ? 'PATCH' : 'POST';
+
+      try {
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al guardar el dueño: ${errorText}`);
+        }
+
+        alert(id ? 'Dueño actualizado correctamente' : 'Dueño creado correctamente');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalDueno'));
+        modal.hide();
+        cargarDuenos(); // Recargar la tabla después de guardar
+      } catch (error) {
+        console.error('Error al guardar el dueño:', error);
+        alert('Ocurrió un error al guardar el dueño. Por favor, intenta nuevamente.');
+      }
+    });
 
     // Función para eliminar un registro
     async function eliminar(id) {
@@ -107,7 +243,7 @@
           if (!response.ok) throw new Error('Error al eliminar el dueño');
 
           alert('Dueño eliminado');
-          cargarDuenos(); // Recargar la tabla después de eliminar
+          cargarDuenos();
         } catch (error) {
           console.error('Error al eliminar el dueño:', error);
         }

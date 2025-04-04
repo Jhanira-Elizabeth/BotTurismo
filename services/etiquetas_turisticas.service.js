@@ -4,10 +4,11 @@ const sequelize = require('../libs/sequelize');
 class EtiquetaService {
   constructor() {}
 
+  // Crear una nueva etiqueta turística
   async create(data) {
     const query = `
-      INSERT INTO puntos_turisticos_etiqueta (id_punto_turistico, id_etiqueta, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
-      VALUES (:id_punto_turistico, :id_etiqueta, :estado, :creado_por, :editado_por, :fecha_creacion, :fecha_ultima_edicion)
+      INSERT INTO etiquetas_turisticas (nombre, descripcion, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
+      VALUES (:nombre, :descripcion, :estado, :creado_por, :editado_por, :fecha_creacion, :fecha_ultima_edicion)
       RETURNING *;
     `;
     const [newEtiqueta] = await sequelize.query(query, {
@@ -16,28 +17,31 @@ class EtiquetaService {
     return newEtiqueta;
   }
 
+  // Obtener todas las etiquetas turísticas
   async find() {
-    const query = 'SELECT * FROM puntos_turisticos_etiqueta';
+    const query = 'SELECT * FROM etiquetas_turisticas';
     const [data] = await sequelize.query(query);
     return data;
   }
 
+  // Obtener una etiqueta turística por ID
   async findOne(id) {
-    const query = 'SELECT * FROM puntos_turisticos_etiqueta WHERE id = :id';
+    const query = 'SELECT * FROM etiquetas_turisticas WHERE id = :id';
     const [data] = await sequelize.query(query, {
       replacements: { id },
     });
     if (!data.length) {
-      throw boom.notFound('Relación etiqueta no encontrada');
+      throw boom.notFound('Etiqueta turística no encontrada');
     }
     return data[0];
   }
 
+  // Actualizar una etiqueta turística
   async update(id, changes) {
     const query = `
-      UPDATE puntos_turisticos_etiqueta
-      SET id_punto_turistico = COALESCE(:id_punto_turistico, id_punto_turistico),
-          id_etiqueta = COALESCE(:id_etiqueta, id_etiqueta),
+      UPDATE etiquetas_turisticas
+      SET nombre = COALESCE(:nombre, nombre),
+          descripcion = COALESCE(:descripcion, descripcion),
           estado = COALESCE(:estado, estado),
           editado_por = COALESCE(:editado_por, editado_por),
           fecha_ultima_edicion = COALESCE(:fecha_ultima_edicion, fecha_ultima_edicion)
@@ -48,18 +52,19 @@ class EtiquetaService {
       replacements: { id, ...changes },
     });
     if (!updatedEtiqueta.length) {
-      throw boom.notFound('Relación etiqueta no encontrada');
+      throw boom.notFound('Etiqueta turística no encontrada');
     }
     return updatedEtiqueta[0];
   }
 
+  // Eliminar una etiqueta turística
   async delete(id) {
-    const query = 'DELETE FROM puntos_turisticos_etiqueta WHERE id = :id RETURNING id';
+    const query = 'DELETE FROM etiquetas_turisticas WHERE id = :id RETURNING id';
     const [result] = await sequelize.query(query, {
       replacements: { id },
     });
     if (!result.length) {
-      throw boom.notFound('Relación etiqueta no encontrada');
+      throw boom.notFound('Etiqueta turística no encontrada');
     }
     return { id: result[0].id };
   }

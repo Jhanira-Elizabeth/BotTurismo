@@ -15,40 +15,100 @@
     <ul class="nav nav-tabs">
       <li class="nav-item"><a class="nav-link" href="locales.html">Locales Turísticos</a></li>
       <li class="nav-item"><a class="nav-link" href="puntos.html">Puntos Turísticos</a></li>
-      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
       <li class="nav-item"><a class="nav-link active" href="actividades.html">Actividades</a></li>
-      <li class="nav-item"><a class="nav-link" href="localEtiqueta.html">Local Etiqueta</a></li>
+      <li class="nav-item"><a class="nav-link" href="etiquetas.html">Etiquetas Turísticas</a></li>
       <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
       <li class="nav-item"><a class="nav-link" href="duenos.html">Dueños</a></li>
       <li class="nav-item"><a class="nav-link" href="parroquias.html">Parroquias</a></li>
       <li class="nav-item"><a class="nav-link" href="horarios.html">Horarios de Atención</a></li>
     </ul>
 
-    <!-- Contenido de la tabla de Actividades -->
-    <div class="mt-4">
-      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Actividad</button>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Actividad</th>
-            <th>Estado</th>
-            <th>Creado Por</th>
-            <th>Fecha Creación</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tablaActividades">
-          <!-- Aquí se llenarán los datos dinámicamente -->
-        </tbody>
-      </table>
+    <!-- Botón para abrir el formulario modal -->
+    <button class="btn btn-success mb-3" onclick="abrirFormularioCrear()">Agregar Actividad</button>
+
+    <!-- Tabla para mostrar las actividades -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Actividad</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Creado Por</th>
+          <th>Editado Por</th>
+          <th>Fecha Creación</th>
+          <th>Fecha Última Edición</th>
+          <th>Tipo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaActividades">
+        <!-- Aquí se llenarán los datos dinámicamente -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal para Crear/Editar Actividad -->
+  <div class="modal fade" id="modalActividad" tabindex="-1" aria-labelledby="modalActividadLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalActividadLabel">Crear/Editar Actividad</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formActividad">
+            <input type="hidden" id="actividadId">
+            <div class="mb-3">
+              <label for="actividadPuntoTuristico" class="form-label">ID Punto Turístico</label>
+              <input type="number" class="form-control" id="actividadPuntoTuristico" placeholder="Ejemplo: 1" required>
+            </div>
+            <div class="mb-3">
+              <label for="actividadNombre" class="form-label">Nombre de la Actividad</label>
+              <input type="text" class="form-control" id="actividadNombre" placeholder="Ejemplo: Patinar" required>
+            </div>
+            <div class="mb-3">
+              <label for="actividadPrecio" class="form-label">Precio</label>
+              <input type="number" class="form-control" id="actividadPrecio" placeholder="Ejemplo: 20.00">
+            </div>
+            <div class="mb-3">
+              <label for="actividadEstado" class="form-label">Estado</label>
+              <select class="form-control" id="actividadEstado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="actividadCreador" class="form-label">Creado Por</label>
+              <input type="text" class="form-control" id="actividadCreador" placeholder="Ejemplo: Jhan" required>
+            </div>
+            <div class="mb-3">
+              <label for="actividadEditor" class="form-label">Editado Por</label>
+              <input type="text" class="form-control" id="actividadEditor" placeholder="Ejemplo: Admin">
+            </div>
+            <div class="mb-3">
+              <label for="actividadFechaCreacion" class="form-label">Fecha Creación</label>
+              <input type="datetime-local" class="form-control" id="actividadFechaCreacion" required>
+            </div>
+            <div class="mb-3">
+              <label for="actividadFechaUltimaEdicion" class="form-label">Fecha Última Edición</label>
+              <input type="datetime-local" class="form-control" id="actividadFechaUltimaEdicion" required>
+            </div>
+            <div class="mb-3">
+              <label for="actividadTipo" class="form-label">Tipo</label>
+              <input type="text" class="form-control" id="actividadTipo" placeholder="Ejemplo: Natación" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Enlace a Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Función para cargar los datos de Actividades
+    // Función para cargar las actividades desde el backend
     async function cargarActividades() {
       try {
         const response = await fetch('http://localhost:3000/api/v1/actividades');
@@ -62,12 +122,16 @@
             <tr>
               <td>${actividad.id}</td>
               <td>${actividad.actividad || 'Sin actividad'}</td>
+              <td>${actividad.precio || 'Sin precio'}</td>
               <td>${actividad.estado || 'Sin estado'}</td>
               <td>${actividad.creado_por || 'Desconocido'}</td>
-              <td>${new Date(actividad.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+              <td>${actividad.editado_por || 'Sin editor'}</td>
+              <td>${new Date(actividad.fecha_creacion).toLocaleString() || 'Sin fecha'}</td>
+              <td>${new Date(actividad.fecha_ultima_edicion).toLocaleString() || 'Sin fecha'}</td>
+              <td>${actividad.tipo || 'Sin tipo'}</td>
               <td>
-                <button class="btn btn-primary btn-sm" onclick="editar(${actividad.id})">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="eliminar(${actividad.id})">Eliminar</button>
+                <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${actividad.id}, ${actividad.id_punto_turistico}, '${actividad.actividad}', ${actividad.precio}, '${actividad.estado}', '${actividad.creado_por}', '${actividad.editado_por}', '${actividad.fecha_creacion}', '${actividad.fecha_ultima_edicion}', '${actividad.tipo}')">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarActividad(${actividad.id})">Eliminar</button>
               </td>
             </tr>
           `;
@@ -78,18 +142,76 @@
       }
     }
 
-    // Función para abrir el formulario de agregar (placeholder)
-    function abrirFormulario() {
-      alert('Abrir formulario para agregar una nueva actividad');
+    // Función para abrir el formulario modal para crear una actividad
+    function abrirFormularioCrear() {
+      document.getElementById('formActividad').reset();
+      document.getElementById('modalActividadLabel').textContent = 'Crear Actividad';
+      document.getElementById('actividadId').value = '';
+      document.getElementById('actividadFechaCreacion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      document.getElementById('actividadFechaUltimaEdicion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      const modal = new bootstrap.Modal(document.getElementById('modalActividad'));
+      modal.show();
     }
 
-    // Función para editar un registro (placeholder)
-    function editar(id) {
-      alert(`Editar actividad con ID: ${id}`);
+    // Función para abrir el formulario modal para editar una actividad
+    function abrirFormularioEditar(id, id_punto_turistico, actividad, precio, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion, tipo) {
+      document.getElementById('modalActividadLabel').textContent = 'Editar Actividad';
+      document.getElementById('actividadId').value = id;
+      document.getElementById('actividadPuntoTuristico').value = id_punto_turistico;
+      document.getElementById('actividadNombre').value = actividad;
+      document.getElementById('actividadPrecio').value = precio;
+      document.getElementById('actividadEstado').value = estado;
+      document.getElementById('actividadCreador').value = creado_por;
+      document.getElementById('actividadEditor').value = editado_por;
+      document.getElementById('actividadFechaCreacion').value = new Date(fecha_creacion).toISOString().slice(0, 16);
+      document.getElementById('actividadFechaUltimaEdicion').value = new Date(fecha_ultima_edicion).toISOString().slice(0, 16);
+      document.getElementById('actividadTipo').value = tipo;
+      const modal = new bootstrap.Modal(document.getElementById('modalActividad'));
+      modal.show();
     }
 
-    // Función para eliminar un registro
-    async function eliminar(id) {
+    // Función para manejar el envío del formulario
+    document.getElementById('formActividad').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('actividadId').value;
+      const id_punto_turistico = document.getElementById('actividadPuntoTuristico').value;
+      const actividad = document.getElementById('actividadNombre').value;
+      const precio = document.getElementById('actividadPrecio').value || null;
+      const estado = document.getElementById('actividadEstado').value;
+      const creado_por = document.getElementById('actividadCreador').value;
+      const editado_por = document.getElementById('actividadEditor').value || null;
+      const fecha_creacion = document.getElementById('actividadFechaCreacion').value;
+      const fecha_ultima_edicion = document.getElementById('actividadFechaUltimaEdicion').value;
+      const tipo = document.getElementById('actividadTipo').value;
+
+      const data = { id_punto_turistico, actividad, precio, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion, tipo };
+
+      const url = id
+        ? `http://localhost:3000/api/v1/actividades/${id}` // Edición
+        : 'http://localhost:3000/api/v1/actividades'; // Creación
+      const method = id ? 'PATCH' : 'POST';
+
+      try {
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error al guardar la actividad');
+
+        alert(id ? 'Actividad actualizada correctamente' : 'Actividad creada correctamente');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalActividad'));
+        modal.hide();
+        cargarActividades();
+      } catch (error) {
+        console.error('Error al guardar la actividad:', error);
+      }
+    }); // Cierra correctamente la función submit
+
+    // Función para eliminar una actividad
+    async function eliminarActividad(id) {
       if (confirm('¿Estás seguro de que deseas eliminar esta actividad?')) {
         try {
           const response = await fetch(`http://localhost:3000/api/v1/actividades/${id}`, {
@@ -99,14 +221,14 @@
           if (!response.ok) throw new Error('Error al eliminar la actividad');
 
           alert('Actividad eliminada');
-          cargarActividades(); // Recargar la tabla después de eliminar
+          cargarActividades();
         } catch (error) {
           console.error('Error al eliminar la actividad:', error);
         }
       }
     }
 
-    // Cargar los datos al cargar la página
+    // Cargar las actividades al cargar la página
     document.addEventListener('DOMContentLoaded', cargarActividades);
   </script>
 </body>

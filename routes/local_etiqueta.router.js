@@ -1,5 +1,4 @@
 const express = require('express');
-
 const LocalEtiquetaService = require('./../services/local_etiqueta.service');
 const validatorHandler = require('./../middlewares/validator.handler');
 const {
@@ -11,6 +10,7 @@ const {
 const router = express.Router();
 const service = new LocalEtiquetaService();
 
+// Obtener todas las relaciones
 router.get('/', async (req, res, next) => {
   try {
     const localEtiquetas = await service.find();
@@ -20,13 +20,14 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+// Obtener una relación específica
 router.get(
-  '/:id',
+  '/:id_local/:id_etiqueta',
   validatorHandler(getLocalEtiquetaSchema, 'params'),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const localEtiqueta = await service.findOne(id);
+      const { id_local, id_etiqueta } = req.params;
+      const localEtiqueta = await service.findOne(id_local, id_etiqueta);
       res.json(localEtiqueta);
     } catch (error) {
       next(error);
@@ -34,6 +35,7 @@ router.get(
   },
 );
 
+// Crear una nueva relación
 router.post(
   '/',
   validatorHandler(createLocalEtiquetaSchema, 'body'),
@@ -48,15 +50,16 @@ router.post(
   },
 );
 
+// Actualizar una relación existente
 router.patch(
-  '/:id',
+  '/:id_local/:id_etiqueta',
   validatorHandler(getLocalEtiquetaSchema, 'params'),
   validatorHandler(updateLocalEtiquetaSchema, 'body'),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
+      const { id_local, id_etiqueta } = req.params;
       const body = req.body;
-      const updatedLocalEtiqueta = await service.update(id, body);
+      const updatedLocalEtiqueta = await service.update(id_local, id_etiqueta, body);
       res.json(updatedLocalEtiqueta);
     } catch (error) {
       next(error);
@@ -64,14 +67,15 @@ router.patch(
   },
 );
 
+// Eliminar una relación
 router.delete(
-  '/:id',
+  '/:id_local/:id_etiqueta',
   validatorHandler(getLocalEtiquetaSchema, 'params'),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
-      await service.delete(id);
-      res.status(201).json({ id });
+      const { id_local, id_etiqueta } = req.params;
+      await service.delete(id_local, id_etiqueta);
+      res.status(201).json({ message: 'Relación eliminada', id_local, id_etiqueta });
     } catch (error) {
       next(error);
     }

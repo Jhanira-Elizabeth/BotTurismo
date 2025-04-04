@@ -6,8 +6,8 @@ class DuenosService {
 
   async create(data) {
     const query = `
-      INSERT INTO duenos_locales (nombre, apellido, cedula, telefono, email, contrasena, departamento, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
-      VALUES (:nombre, :apellido, :cedula, :telefono, :email, :contrasena, :departamento, :estado, :creado_por, :editado_por, :fecha_creacion, :fecha_ultima_edicion)
+      INSERT INTO duenos_locales (nombre, apellido, cedula, telefono, email, contrasena, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
+      VALUES (:nombre, :apellido, :cedula, :telefono, :email, :contrasena, :estado, :creado_por, :editado_por, :fecha_creacion, :fecha_ultima_edicion)
       RETURNING *;
     `;
     const [newDueno] = await sequelize.query(query, {
@@ -41,17 +41,17 @@ class DuenosService {
           cedula = COALESCE(:cedula, cedula),
           telefono = COALESCE(:telefono, telefono),
           email = COALESCE(:email, email),
-          contrasena = COALESCE(:contrasena, contrasena),
-          departamento = COALESCE(:departamento, departamento),
+          ${changes.contrasena ? 'contrasena = COALESCE(:contrasena, contrasena),' : ''}
           estado = COALESCE(:estado, estado),
-          editado_por = COALESCE(:editado_por, editado_por),
-          fecha_ultima_edicion = COALESCE(:fecha_ultima_edicion, fecha_ultima_edicion)
+          ${changes.editado_por ? 'editado_por = COALESCE(:editado_por, editado_por),' : ''}
+          fecha_ultima_edicion = NOW()
       WHERE id = :id
       RETURNING *;
     `;
-    const [updatedDueno] = await sequelize.query(query, {
-      replacements: { id, ...changes },
-    });
+  
+    const replacements = { id, ...changes };
+    const [updatedDueno] = await sequelize.query(query, { replacements });
+  
     if (!updatedDueno.length) {
       throw boom.notFound('Dueño no encontrado');
     }

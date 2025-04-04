@@ -2,19 +2,19 @@ const Joi = require('joi');
 
 // Esquemas para las propiedades individuales
 const id = Joi.number().integer().positive();
-const nombre = Joi.string().max(255);
-const descripcion = Joi.string().allow(null, '');
-const estado = Joi.string().valid('activo', 'inactivo').max(20);
-const creado_por = Joi.string().max(255).allow(null, '');
+const nombre = Joi.string().max(255).required();
+const descripcion = Joi.string().max(255).allow(null, '');
+const estado = Joi.string().valid('activo', 'inactivo').max(20).required();
+const creado_por = Joi.string().max(255).required();
 const editado_por = Joi.string().max(255).allow(null, '');
-const fecha_creacion = Joi.date().iso().allow(null);
-const fecha_ultima_edicion = Joi.date().iso().allow(null);
+const fecha_creacion = Joi.date().iso().required();
+const fecha_ultima_edicion = Joi.date().iso().required();
 
 // Esquema para crear una etiqueta turística
 const createEtiquetaSchema = Joi.object({
-  nombre: nombre.required(),
+  nombre,
   descripcion,
-  estado: estado.required(),
+  estado,
   creado_por,
   editado_por,
   fecha_creacion,
@@ -26,9 +26,7 @@ const updateEtiquetaSchema = Joi.object({
   nombre,
   descripcion,
   estado,
-  creado_por,
   editado_por,
-  fecha_creacion,
   fecha_ultima_edicion,
 });
 

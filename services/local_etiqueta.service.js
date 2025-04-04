@@ -1,67 +1,103 @@
 const boom = require('@hapi/boom');
-const sequelize = require('../libs/sequelize');
+const { sequelize } = require('./../libs/sequelize');
 
 class LocalEtiquetaService {
   constructor() {}
 
-  async create(data) {
-    const query = `
-      INSERT INTO local_etiqueta (id_local, id_etiqueta, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
-      VALUES (:id_local, :id_etiqueta, :estado, :creado_por, :editado_por, :fecha_creacion, :fecha_ultima_edicion)
-      RETURNING *;
-    `;
-    const [newLocalEtiqueta] = await sequelize.query(query, {
-      replacements: data,
-    });
-    return newLocalEtiqueta;
-  }
-
+  // Obtener todas las relaciones
   async find() {
-    const query = 'SELECT * FROM local_etiqueta';
-    const [data] = await sequelize.query(query);
-    return data;
+    try {
+      const query = 'SELECT * FROM local_etiqueta';
+      const [data] = await sequelize.query(query);
+      return data;
+    } catch (error) {
+      console.error('Error al obtener las relaciones:', error);
+      throw boom.internal('Error al obtener las relaciones');
+    }
   }
 
-  async findOne(id) {
-    const query = 'SELECT * FROM local_etiqueta WHERE id = :id';
-    const [data] = await sequelize.query(query, {
-      replacements: { id },
-    });
-    if (!data.length) {
-      throw boom.notFound('Relación local-etiqueta no encontrada');
+  // Obtener una relación específica
+  async findOne(id_local, id_etiqueta) {
+    try {
+      const query = `
+        SELECT * FROM local_etiqueta
+        WHERE id_local = :id_local AND id_etiqueta = :id_etiqueta
+      `;
+      const [data] = await sequelize.query(query, {
+        replacements: { id_local, id_etiqueta },
+      });
+      if (data.length === 0) {
+        throw boom.notFound('Relación no encontrada');
+      }
+      return data[0];
+    } catch (error) {
+      console.error('Error al obtener la relación:', error);
+      throw boom.internal('Error al obtener la relación');
     }
-    return data[0];
   }
 
-  async update(id, changes) {
-    const query = `
-      UPDATE local_etiqueta
-      SET id_local = COALESCE(:id_local, id_local),
-          id_etiqueta = COALESCE(:id_etiqueta, id_etiqueta),
-          estado = COALESCE(:estado, estado),
-          editado_por = COALESCE(:editado_por, editado_por),
-          fecha_ultima_edicion = COALESCE(:fecha_ultima_edicion, fecha_ultima_edicion)
-      WHERE id = :id
-      RETURNING *;
-    `;
-    const [updatedLocalEtiqueta] = await sequelize.query(query, {
-      replacements: { id, ...changes },
-    });
-    if (!updatedLocalEtiqueta.length) {
-      throw boom.notFound('Relación local-etiqueta no encontrada');
+  // Crear una nueva relación
+  async create(data) {
+    try {
+      const query = `
+        INSERT INTO local_etiqueta (id_local, id_etiqueta, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
+        VALUES (:id_local, :id_etiqueta, :estado, :creado_por, :editado_por, :fecha_creacion, :fecha_ultima_edicion)
+        RETURNING *;
+      `;
+      const [result] = await sequelize.query(query, {
+        replacements: data,
+      });
+      return result[0];
+    } catch (error) {
+      if (error.parent?.code === '23505') {
+        throw boom.conflict('La relación ya existe.');
+      }
+      console.error('Error al crear la relación:', error);
+      throw boom.internal('Error al crear la relación');
     }
-    return updatedLocalEtiqueta[0];
   }
 
-  async delete(id) {
-    const query = 'DELETE FROM local_etiqueta WHERE id = :id RETURNING id';
-    const [result] = await sequelize.query(query, {
-      replacements: { id },
-    });
-    if (!result.length) {
-      throw boom.notFound('Relación local-etiqueta no encontrada');
+  // Actualizar una relación existente
+  async update(id_local, id_etiqueta, changes) {
+    try {
+      const query = `
+        UPDATE local_etiqueta
+        SET estado = :estado, editado_por = :editado_por, fecha_ultima_edicion = :fecha_ultima_edicion
+        WHERE id_local = :id_local AND id_etiqueta = :id_etiqueta
+        RETURNING *;
+      `;
+      const [result] = await sequelize.query(query, {
+        replacements: { ...changes, id_local, id_etiqueta },
+      });
+      if (result.length === 0) {
+        throw boom.notFound('Relación no encontrada');
+      }
+      return result[0];
+    } catch (error) {
+      console.error('Error al actualizar la relación:', error);
+      throw boom.internal('Error al actualizar la relación');
     }
-    return { id: result[0].id };
+  }
+
+  // Eliminar una relación
+  async delete(id_local, id_etiqueta) {
+    try {
+      const query = `
+        DELETE FROM local_etiqueta
+        WHERE id_local = :id_local AND id_etiqueta = :id_etiqueta
+        RETURNING *;
+      `;
+      const [result] = await sequelize.query(query, {
+        replacements: { id_local, id_etiqueta },
+      });
+      if (result.length === 0) {
+        throw boom.notFound('Relación no encontrada');
+      }
+      return result[0];
+    } catch (error) {
+      console.error('Error al eliminar la relación:', error);
+      throw boom.internal('Error al eliminar la relación');
+    }
   }
 }
 

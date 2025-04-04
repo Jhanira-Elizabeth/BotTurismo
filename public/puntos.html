@@ -26,13 +26,16 @@
 
     <!-- Contenido de la tabla de Puntos Turísticos -->
     <div class="mt-4">
-      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Punto</button>
+      <button class="btn btn-success mb-3" onclick="abrirFormularioCrear()">Agregar Punto</button>
       <table class="table table-striped">
         <thead>
           <tr>
             <th>ID</th>
             <th>Nombre</th>
             <th>Descripción</th>
+            <th>Latitud</th>
+            <th>Longitud</th>
+            <th>ID Parroquia</th>
             <th>Estado</th>
             <th>Creado Por</th>
             <th>Fecha Creación</th>
@@ -46,49 +49,179 @@
     </div>
   </div>
 
+  <!-- Modal para Crear/Editar Punto Turístico -->
+  <div class="modal fade" id="modalPunto" tabindex="-1" aria-labelledby="modalPuntoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalPuntoLabel">Crear/Editar Punto Turístico</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formPunto">
+            <div class="mb-3">
+              <label for="puntoNombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="puntoNombre" placeholder="Ejemplo: Casita" required>
+            </div>
+            <div class="mb-3">
+              <label for="puntoDescripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="puntoDescripcion" placeholder="Ejemplo: Mi casa." required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="puntoLatitud" class="form-label">Latitud</label>
+              <input type="text" class="form-control" id="puntoLatitud" placeholder="Ejemplo: -0.390846" required>
+            </div>
+            <div class="mb-3">
+              <label for="puntoLongitud" class="form-label">Longitud</label>
+              <input type="text" class="form-control" id="puntoLongitud" placeholder="Ejemplo: -79.351443" required>
+            </div>
+            <div class="mb-3">
+              <label for="puntoIdParroquia" class="form-label">ID Parroquia</label>
+              <input type="number" class="form-control" id="puntoIdParroquia" placeholder="Ejemplo: 39" required>
+            </div>
+            <div class="mb-3">
+              <label for="puntoEstado" class="form-label">Estado</label>
+              <select class="form-control" id="puntoEstado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="puntoCreador" class="form-label">Creado Por</label>
+              <input type="text" class="form-control" id="puntoCreador" placeholder="Ejemplo: Jhan" required>
+            </div>
+            <div class="mb-3">
+              <label for="puntoEditor" class="form-label">Editado Por</label>
+              <input type="text" class="form-control" id="puntoEditor" placeholder="Ejemplo: Jhan">
+            </div>
+            <div class="mb-3">
+              <label for="puntoFechaCreacion" class="form-label">Fecha Creación</label>
+              <input type="datetime-local" class="form-control" id="puntoFechaCreacion" required>
+            </div>
+            <div class="mb-3">
+              <label for="puntoFechaUltimaEdicion" class="form-label">Fecha Última Edición</label>
+              <input type="datetime-local" class="form-control" id="puntoFechaUltimaEdicion" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Enlace a Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    let puntoId = null; // Variable para almacenar el ID del punto en edición
+
     // Función para cargar los datos de Puntos Turísticos
     async function cargarPuntos() {
+  try {
+    const response = await fetch('http://localhost:3000/api/v1/puntos');
+    const puntos = await response.json();
+
+    // Ordenar los puntos por ID de forma ascendente
+    puntos.sort((a, b) => a.id - b.id);
+
+    const tabla = document.getElementById('tablaPuntos');
+    tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
+
+    puntos.forEach((punto) => {
+      const fila = `
+        <tr>
+          <td>${punto.id}</td>
+          <td>${punto.nombre || 'Sin nombre'}</td>
+          <td>${punto.descripcion || 'Sin descripción'}</td>
+          <td>${punto.latitud || 'Sin latitud'}</td>
+          <td>${punto.longitud || 'Sin longitud'}</td>
+          <td>${punto.id_parroquia || 'Sin parroquia'}</td>
+          <td>${punto.estado || 'Sin estado'}</td>
+          <td>${punto.creado_por || 'Desconocido'}</td>
+          <td>${new Date(punto.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
+          <td>
+            <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${punto.id}, '${punto.nombre}', '${punto.descripcion}', '${punto.latitud}', '${punto.longitud}', ${punto.id_parroquia}, '${punto.estado}', '${punto.creado_por}', '${punto.editado_por}', '${punto.fecha_creacion}', '${punto.fecha_ultima_edicion}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="eliminar(${punto.id})">Eliminar</button>
+          </td>
+        </tr>
+      `;
+      tabla.innerHTML += fila;
+    });
+  } catch (error) {
+    console.error('Error al cargar los puntos turísticos:', error);
+  }
+}
+
+    // Función para abrir el formulario modal para crear un punto
+    function abrirFormularioCrear() {
+      puntoId = null; // Limpiar el ID del punto en edición
+      document.getElementById('formPunto').reset();
+      document.getElementById('modalPuntoLabel').textContent = 'Crear Punto Turístico';
+      document.getElementById('puntoFechaCreacion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      document.getElementById('puntoFechaUltimaEdicion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      const modal = new bootstrap.Modal(document.getElementById('modalPunto'));
+      modal.show();
+    }
+
+    // Función para abrir el formulario modal para editar un punto
+    function abrirFormularioEditar(id, nombre, descripcion, latitud, longitud, id_parroquia, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion) {
+      puntoId = id; // Almacenar el ID del punto en edición
+      document.getElementById('modalPuntoLabel').textContent = 'Editar Punto Turístico';
+      document.getElementById('puntoNombre').value = nombre;
+      document.getElementById('puntoDescripcion').value = descripcion;
+      document.getElementById('puntoLatitud').value = latitud;
+      document.getElementById('puntoLongitud').value = longitud;
+      document.getElementById('puntoIdParroquia').value = id_parroquia;
+      document.getElementById('puntoEstado').value = estado;
+      document.getElementById('puntoCreador').value = creado_por;
+      document.getElementById('puntoEditor').value = editado_por;
+      document.getElementById('puntoFechaCreacion').value = new Date(fecha_creacion).toISOString().slice(0, 16);
+      document.getElementById('puntoFechaUltimaEdicion').value = new Date(fecha_ultima_edicion).toISOString().slice(0, 16);
+      const modal = new bootstrap.Modal(document.getElementById('modalPunto'));
+      modal.show();
+    }
+
+    // Función para manejar el envío del formulario
+    document.getElementById('formPunto').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        nombre: document.getElementById('puntoNombre').value,
+        descripcion: document.getElementById('puntoDescripcion').value,
+        latitud: document.getElementById('puntoLatitud').value,
+        longitud: document.getElementById('puntoLongitud').value,
+        id_parroquia: document.getElementById('puntoIdParroquia').value,
+        estado: document.getElementById('puntoEstado').value,
+        creado_por: document.getElementById('puntoCreador').value,
+        editado_por: document.getElementById('puntoEditor').value || null,
+        fecha_creacion: new Date(document.getElementById('puntoFechaCreacion').value).toISOString(),
+        fecha_ultima_edicion: new Date(document.getElementById('puntoFechaUltimaEdicion').value).toISOString(),
+      };
+
+      const method = puntoId ? 'PATCH' : 'POST';
+      const url = puntoId
+        ? `http://localhost:3000/api/v1/puntos/${puntoId}`
+        : `http://localhost:3000/api/v1/puntos`;
+
       try {
-        const response = await fetch('http://localhost:3000/api/v1/puntos');
-        const puntos = await response.json();
-
-        const tabla = document.getElementById('tablaPuntos');
-        tabla.innerHTML = ''; // Limpia la tabla antes de llenarla
-
-        puntos.forEach((punto) => {
-          const fila = `
-            <tr>
-              <td>${punto.id}</td>
-              <td>${punto.nombre || 'Sin nombre'}</td>
-              <td>${punto.descripcion || 'Sin descripción'}</td>
-              <td>${punto.estado || 'Sin estado'}</td>
-              <td>${punto.creado_por || 'Desconocido'}</td>
-              <td>${new Date(punto.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
-              <td>
-                <button class="btn btn-primary btn-sm" onclick="editar(${punto.id})">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="eliminar(${punto.id})">Eliminar</button>
-              </td>
-            </tr>
-          `;
-          tabla.innerHTML += fila;
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
         });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al guardar el punto turístico: ${errorText}`);
+        }
+
+        alert('Punto turístico guardado correctamente');
+        cargarPuntos(); // Recargar la tabla después de guardar
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalPunto'));
+        modal.hide();
       } catch (error) {
-        console.error('Error al cargar los puntos turísticos:', error);
+        console.error('Error al guardar el punto turístico:', error);
       }
-    }
-
-    // Función para abrir el formulario de agregar (placeholder)
-    function abrirFormulario() {
-      alert('Abrir formulario para agregar un nuevo punto turístico');
-    }
-
-    // Función para editar un registro (placeholder)
-    function editar(id) {
-      alert(`Editar punto turístico con ID: ${id}`);
-    }
+    });
 
     // Función para eliminar un registro
     async function eliminar(id) {

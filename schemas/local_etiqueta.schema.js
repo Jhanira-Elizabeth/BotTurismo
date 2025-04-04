@@ -1,28 +1,14 @@
 const Joi = require('joi');
 
-// Esquemas para las propiedades individuales
-const id = Joi.number().integer().positive();
-const id_local = Joi.number().integer().positive();
-const id_etiqueta = Joi.number().integer().positive();
-const estado = Joi.string().valid('activo', 'inactivo').max(20);
-const creado_por = Joi.string().max(255).allow(null, '');
-const editado_por = Joi.string().max(255).allow(null, '');
-const fecha_creacion = Joi.date().iso().allow(null);
-const fecha_ultima_edicion = Joi.date().iso().allow(null);
+const id_local = Joi.number().integer().positive().required();
+const id_etiqueta = Joi.number().integer().positive().required();
+const estado = Joi.string().valid('activo', 'inactivo').required();
+const creado_por = Joi.string().min(3).max(50).required();
+const editado_por = Joi.string().min(3).max(50).allow(null);
+const fecha_creacion = Joi.date().iso().required();
+const fecha_ultima_edicion = Joi.date().iso().required();
 
-// Esquema para crear una relación entre local y etiqueta
 const createLocalEtiquetaSchema = Joi.object({
-  id_local: id_local.required(),
-  id_etiqueta: id_etiqueta.required(),
-  estado: estado.required(),
-  creado_por,
-  editado_por,
-  fecha_creacion,
-  fecha_ultima_edicion,
-});
-
-// Esquema para actualizar una relación entre local y etiqueta
-const updateLocalEtiquetaSchema = Joi.object({
   id_local,
   id_etiqueta,
   estado,
@@ -32,9 +18,15 @@ const updateLocalEtiquetaSchema = Joi.object({
   fecha_ultima_edicion,
 });
 
-// Esquema para obtener una relación entre local y etiqueta por ID
+const updateLocalEtiquetaSchema = Joi.object({
+  estado: estado.optional(),
+  editado_por: editado_por.optional(),
+  fecha_ultima_edicion: fecha_ultima_edicion.optional(),
+}).min(1);
+
 const getLocalEtiquetaSchema = Joi.object({
-  id: id.required(),
+  id_local,
+  id_etiqueta,
 });
 
 module.exports = {

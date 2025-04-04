@@ -26,7 +26,7 @@
 
     <!-- Contenido de la tabla de Parroquias -->
     <div class="mt-4">
-      <button class="btn btn-success mb-3" onclick="abrirFormulario()">Agregar Parroquia</button>
+      <button class="btn btn-success mb-3" onclick="abrirFormularioCrear()">Agregar Parroquia</button>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -49,9 +49,71 @@
     </div>
   </div>
 
+  <!-- Modal para Crear/Editar Parroquia -->
+  <div class="modal fade" id="modalParroquia" tabindex="-1" aria-labelledby="modalParroquiaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalParroquiaLabel">Crear/Editar Parroquia</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formParroquia">
+            <div class="mb-3">
+              <label for="parroquiaNombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="parroquiaNombre" placeholder="Ejemplo: Mi casa" required>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaFechaFundacion" class="form-label">Fecha Fundación</label>
+              <input type="text" class="form-control" id="parroquiaFechaFundacion" placeholder="Ejemplo: 1 enero 2006" required>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaPoblacion" class="form-label">Población</label>
+              <input type="number" class="form-control" id="parroquiaPoblacion" placeholder="Ejemplo: 5" required>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaClima" class="form-label">Clima</label>
+              <input type="text" class="form-control" id="parroquiaClima" placeholder="Ejemplo: 20°C" required>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaDescripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="parroquiaDescripcion" placeholder="Ejemplo: Casita." required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaEstado" class="form-label">Estado</label>
+              <select class="form-control" id="parroquiaEstado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaCreador" class="form-label">Creado Por</label>
+              <input type="text" class="form-control" id="parroquiaCreador" placeholder="Ejemplo: Jhan" required>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaEditor" class="form-label">Editado Por</label>
+              <input type="text" class="form-control" id="parroquiaEditor" placeholder="Ejemplo: Jhan">
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaFechaCreacion" class="form-label">Fecha Creación</label>
+              <input type="datetime-local" class="form-control" id="parroquiaFechaCreacion" required>
+            </div>
+            <div class="mb-3">
+              <label for="parroquiaFechaUltimaEdicion" class="form-label">Fecha Última Edición</label>
+              <input type="datetime-local" class="form-control" id="parroquiaFechaUltimaEdicion" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Enlace a Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    let parroquiaId = null; // Variable para almacenar el ID de la parroquia en edición
+
     // Función para cargar los datos de Parroquias
     async function cargarParroquias() {
       try {
@@ -74,7 +136,7 @@
               <td>${parroquia.creado_por || 'Desconocido'}</td>
               <td>${new Date(parroquia.fecha_creacion).toLocaleDateString() || 'Sin fecha'}</td>
               <td>
-                <button class="btn btn-primary btn-sm" onclick="editar(${parroquia.id})">Editar</button>
+                <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${parroquia.id}, '${parroquia.nombre}', '${parroquia.fecha_fundacion}', ${parroquia.poblacion}, '${parroquia.temperatura_promedio}', '${parroquia.descripcion}', '${parroquia.estado}', '${parroquia.creado_por}', '${parroquia.editado_por}', '${parroquia.fecha_creacion}', '${parroquia.fecha_ultima_edicion}')">Editar</button>
                 <button class="btn btn-danger btn-sm" onclick="eliminar(${parroquia.id})">Eliminar</button>
               </td>
             </tr>
@@ -86,15 +148,77 @@
       }
     }
 
-    // Función para abrir el formulario de agregar (placeholder)
-    function abrirFormulario() {
-      alert('Abrir formulario para agregar una nueva parroquia');
+    // Función para abrir el formulario modal para crear una parroquia
+    function abrirFormularioCrear() {
+      parroquiaId = null; // Limpiar el ID de la parroquia en edición
+      document.getElementById('formParroquia').reset();
+      document.getElementById('modalParroquiaLabel').textContent = 'Crear Parroquia';
+      document.getElementById('parroquiaFechaCreacion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      document.getElementById('parroquiaFechaUltimaEdicion').value = new Date().toISOString().slice(0, 16); // Fecha actual
+      const modal = new bootstrap.Modal(document.getElementById('modalParroquia'));
+      modal.show();
     }
 
-    // Función para editar un registro (placeholder)
-    function editar(id) {
-      alert(`Editar parroquia con ID: ${id}`);
+    // Función para abrir el formulario modal para editar una parroquia
+    function abrirFormularioEditar(id, nombre, fecha_fundacion, poblacion, clima, descripcion, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion) {
+      parroquiaId = id; // Almacenar el ID de la parroquia en edición
+      document.getElementById('modalParroquiaLabel').textContent = 'Editar Parroquia';
+      document.getElementById('parroquiaNombre').value = nombre;
+      document.getElementById('parroquiaFechaFundacion').value = fecha_fundacion;
+      document.getElementById('parroquiaPoblacion').value = poblacion;
+      document.getElementById('parroquiaClima').value = clima;
+      document.getElementById('parroquiaDescripcion').value = descripcion;
+      document.getElementById('parroquiaEstado').value = estado;
+      document.getElementById('parroquiaCreador').value = creado_por;
+      document.getElementById('parroquiaEditor').value = editado_por;
+      document.getElementById('parroquiaFechaCreacion').value = new Date(fecha_creacion).toISOString().slice(0, 16);
+      document.getElementById('parroquiaFechaUltimaEdicion').value = new Date(fecha_ultima_edicion).toISOString().slice(0, 16);
+      const modal = new bootstrap.Modal(document.getElementById('modalParroquia'));
+      modal.show();
     }
+
+    // Función para manejar el envío del formulario
+    document.getElementById('formParroquia').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        nombre: document.getElementById('parroquiaNombre').value,
+        fecha_fundacion: document.getElementById('parroquiaFechaFundacion').value,
+        poblacion: document.getElementById('parroquiaPoblacion').value,
+        temperatura_promedio: document.getElementById('parroquiaClima').value,
+        descripcion: document.getElementById('parroquiaDescripcion').value,
+        estado: document.getElementById('parroquiaEstado').value,
+        creado_por: document.getElementById('parroquiaCreador').value,
+        editado_por: document.getElementById('parroquiaEditor').value || null,
+        fecha_creacion: new Date(document.getElementById('parroquiaFechaCreacion').value).toISOString(),
+        fecha_ultima_edicion: new Date(document.getElementById('parroquiaFechaUltimaEdicion').value).toISOString(),
+      };
+
+      const method = parroquiaId ? 'PATCH' : 'POST';
+      const url = parroquiaId
+        ? `http://localhost:3000/api/v1/parroquias/${parroquiaId}`
+        : `http://localhost:3000/api/v1/parroquias`;
+
+      try {
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al guardar la parroquia: ${errorText}`);
+        }
+
+        alert('Parroquia guardada correctamente');
+        cargarParroquias(); // Recargar la tabla después de guardar
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalParroquia'));
+        modal.hide();
+      } catch (error) {
+        console.error('Error al guardar la parroquia:', error);
+      }
+    });
 
     // Función para eliminar un registro
     async function eliminar(id) {

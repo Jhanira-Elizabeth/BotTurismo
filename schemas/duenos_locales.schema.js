@@ -8,7 +8,6 @@ const cedula = Joi.string().max(20);
 const telefono = Joi.string().max(20);
 const email = Joi.string().email().max(255);
 const contrasena = Joi.string().max(255);
-const departamento = Joi.string().max(255).allow(null, '');
 const estado = Joi.string().valid('activo', 'inactivo').max(20);
 const creado_por = Joi.string().max(255).allow(null, '');
 const editado_por = Joi.string().max(255).allow(null, '');
@@ -23,7 +22,6 @@ const createDuenoSchema = Joi.object({
   telefono: telefono.required(),
   email: email.required(),
   contrasena: contrasena.required(),
-  departamento,
   estado: estado.required(),
   creado_por,
   editado_por,
@@ -39,7 +37,6 @@ const updateDuenoSchema = Joi.object({
   telefono,
   email,
   contrasena,
-  departamento,
   estado,
   creado_por,
   editado_por,
