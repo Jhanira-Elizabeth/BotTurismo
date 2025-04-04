@@ -54,9 +54,7 @@ app.get('/local-etiqueta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'local_etiqueta.html'));
 });
 
-app.get('/api/v1/local-etiqueta', (req, res) => {
-  res.json({ message: 'CORS configurado correctamente' });
-});
+
 
 // Rutas de la API
 routerApi(app); // Aquí se agregan las rutas de la API (por ejemplo, productos)
