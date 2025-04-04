@@ -11,7 +11,7 @@ class LocalEtiquetaService {
       const [data] = await sequelize.query(query);
       return data;
     } catch (error) {
-      console.error('Error al obtener las relaciones:', error);
+      console.error('Error al obtener las relaciones:', error.message);
       throw boom.internal('Error al obtener las relaciones');
     }
   }
