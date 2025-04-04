@@ -119,7 +119,7 @@
     // Función para cargar los locales desde el backend
     async function cargarLocales() {
       try {
-        const response = await fetch('https://tursd-api.onrender.com/api/v1/locales');
+        const response = await fetch('https://tursd.onrender.com/api/v1/locales');
         const locales = await response.json();
 
         // Ordenar los locales por ID
@@ -202,8 +202,8 @@
         : { nombre, descripcion, direccion, latitud, longitud, id_dueno, id_parroquia, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion }; // POST payload
 
       const url = id
-        ? `https://tursd-api.onrender.com/api/v1/locales/${id}` // Edición
-        : 'https://tursd-api.onrender.com/api/v1/locales'; // Creación
+        ? `https://tursd.onrender.com/api/v1/locales/${id}` // Edición
+        : 'https://tursd.onrender.com/api/v1/locales'; // Creación
       const method = id ? 'PATCH' : 'POST';
 
       try {
@@ -229,7 +229,7 @@
     async function eliminarLocal(id) {
       if (confirm('¿Estás seguro de que deseas eliminar este local?')) {
         try {
-          const response = await fetch(`https://tursd-api.onrender.com/api/v1/locales/${id}`, {
+          const response = await fetch(`https://tursd.onrender.com/api/v1/locales/${id}`, {
             method: 'DELETE',
           });
 

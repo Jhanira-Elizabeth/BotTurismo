@@ -101,7 +101,7 @@
     // Función para cargar las etiquetas desde el backend
     async function cargarEtiquetas() {
       try {
-        const response = await fetch('https://tursd-api.onrender.com/api/v1/etiquetas');
+        const response = await fetch('https://tursd.onrender.com/api/v1/etiquetas');
         const etiquetas = await response.json();
 
         const tabla = document.getElementById('tablaEtiquetas');
@@ -180,8 +180,8 @@
           }; // POST payload
 
       const url = id
-        ? `https://tursd-api.onrender.com/api/v1/etiquetas/${id}` // Edición
-        : 'https://tursd-api.onrender.com/api/v1/etiquetas'; // Creación
+        ? `https://tursd.onrender.com/api/v1/etiquetas/${id}` // Edición
+        : 'https://tursd.onrender.com/api/v1/etiquetas'; // Creación
       const method = id ? 'PATCH' : 'POST';
 
       try {
@@ -209,7 +209,7 @@
     async function eliminarEtiqueta(id) {
       if (confirm('¿Estás seguro de que deseas eliminar esta etiqueta?')) {
         try {
-          const response = await fetch(`https://tursd-api.onrender.com/api/v1/etiquetas/${id}`, {
+          const response = await fetch(`https://tursd.onrender.com/api/v1/etiquetas/${id}`, {
             method: 'DELETE',
           });
 

@@ -111,7 +111,7 @@
     // Función para cargar los horarios desde el backend
     async function cargarHorarios() {
       try {
-        const response = await fetch('https://tursd-api.onrender.com/api/v1/horarios');
+        const response = await fetch('https://tursd.onrender.com/api/v1/horarios');
         const horarios = await response.json();
 
         // Ordenar los horarios por ID
@@ -192,8 +192,8 @@
         : { id_local, dia_semana, hora_inicio, hora_fin, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion }; // POST payload
 
       const url = id
-        ? `https://tursd-api.onrender.com/api/v1/horarios/${id}` // Edición
-        : 'https://tursd-api.onrender.com/api/v1/horarios'; // Creación
+        ? `https://tursd.onrender.com/api/v1/horarios/${id}` // Edición
+        : 'https://tursd.onrender.com/api/v1/horarios'; // Creación
       const method = id ? 'PATCH' : 'POST';
 
       try {
@@ -219,7 +219,7 @@
     async function eliminarHorario(id) {
       if (confirm('¿Estás seguro de que deseas eliminar este horario?')) {
         try {
-          const response = await fetch(`https://tursd-api.onrender.com/api/v1/horarios/${id}`, {
+          const response = await fetch(`https://tursd.onrender.com/api/v1/horarios/${id}`, {
             method: 'DELETE',
           });
 

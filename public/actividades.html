@@ -111,7 +111,7 @@
     // Función para cargar las actividades desde el backend
     async function cargarActividades() {
       try {
-        const response = await fetch('https://tursd-api.onrender.com/api/v1/actividades');
+        const response = await fetch('https://tursd.onrender.com/api/v1/actividades');
         const actividades = await response.json();
 
         const tabla = document.getElementById('tablaActividades');
@@ -188,8 +188,8 @@
       const data = { id_punto_turistico, actividad, precio, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion, tipo };
 
       const url = id
-        ? `https://tursd-api.onrender.com/api/v1/actividades/${id}` // Edición
-        : 'https://tursd-api.onrender.com/api/v1/actividades'; // Creación
+        ? `https://tursd.onrender.com/api/v1/actividades/${id}` // Edición
+        : 'https://tursd.onrender.com/api/v1/actividades'; // Creación
       const method = id ? 'PATCH' : 'POST';
 
       try {
@@ -214,7 +214,7 @@
     async function eliminarActividad(id) {
       if (confirm('¿Estás seguro de que deseas eliminar esta actividad?')) {
         try {
-          const response = await fetch(`https://tursd-api.onrender.com/api/v1/actividades/${id}`, {
+          const response = await fetch(`https://tursd.onrender.com/api/v1/actividades/${id}`, {
             method: 'DELETE',
           });
 
