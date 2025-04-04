@@ -9,14 +9,14 @@ const cors = require('cors'); // Importar cors para habilitar CORS
 
 app.use(express.json());
 
-const corsOptions = {
-  origin: 'https://tursd.onrender.com', // Permite solo solicitudes desde este origen
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Los métodos permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
-};
+// const corsOptions = {
+//   origin: 'https://tursd.onrender.com', // Permite solo solicitudes desde este origen
+//   methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Los métodos permitidos
+//   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
+// };
 
 // Habilitar CORS con las opciones configuradas
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
 app.use(cors());
 
 // Middleware para parsear JSON
