@@ -265,9 +265,174 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
   <script>
-    // Funciones de JavaScript (cargarLocalEtiqueta, abrirFormularioCrear, abrirFormularioEditar, guardarRelacion, eliminarRelacion)
-    // Se mantienen igual que en el archivo original
+    // Variable para manejar el modal de Bootstrap
+    let modalInstance;
+
+    async function cargarLocalEtiqueta() {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/local-etiqueta');
+        const relaciones = await response.json();
+        const tabla = document.getElementById('tablaLocalEtiqueta');
+        tabla.innerHTML = '';
+        relaciones.forEach((relacion) => {
+          const fila = `
+            <tr>
+              <td>${relacion.id_local}</td>
+              <td>${relacion.id_etiqueta}</td>
+              <td>${relacion.estado}</td>
+              <td>${relacion.creado_por}</td>
+              <td>${new Date(relacion.fecha_creacion).toLocaleString()}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${relacion.id_local}, ${relacion.id_etiqueta}, '${relacion.estado}', '${relacion.creado_por || ''}', '${relacion.editado_por || ''}', '${relacion.fecha_ultima_edicion}')">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarRelacion(${relacion.id_local}, ${relacion.id_etiqueta})">Eliminar</button>
+              </td>
+            </tr>
+          `;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        console.error('Error al cargar las relaciones:', error);
+        alert('Error al cargar las relaciones. Revisa la consola para más detalles.');
+      }
+    }
+
+    function abrirFormularioCrear() {
+      document.getElementById('formLocalEtiqueta').reset();
+      document.getElementById('formMode').value = 'create';
+      document.getElementById('modalLocalEtiquetaLabel').textContent = 'Crear Relación';
+      
+      // Establecer la fecha actual para fecha de creación/edición
+      const fechaActual = new Date();
+      const fechaISO = fechaActual.toISOString().slice(0, 16);
+      document.getElementById('relacionFechaUltimaEdicion').value = fechaISO;
+      
+      // Mostrar campo Creado Por y ocultar/habilitar otros campos según sea necesario
+      document.getElementById('relacionCreadoPor').parentElement.style.display = 'block';
+      
+      // Inicializar y mostrar el modal
+      if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(document.getElementById('modalLocalEtiqueta'));
+      }
+      modalInstance.show();
+    }
+
+    function abrirFormularioEditar(id_local, id_etiqueta, estado, creado_por, editado_por, fecha_ultima_edicion) {
+      document.getElementById('formMode').value = 'edit';
+      document.getElementById('modalLocalEtiquetaLabel').textContent = 'Editar Relación';
+      document.getElementById('relacionIdLocalInput').value = id_local;
+      document.getElementById('relacionIdEtiquetaInput').value = id_etiqueta;
+      document.getElementById('relacionEstado').value = estado;
+      document.getElementById('relacionCreadoPor').value = creado_por;
+      document.getElementById('relacionCreadoPor').disabled = true; // No se puede editar el creador
+      document.getElementById('relacionEditor').value = editado_por || '';
+      
+      // Formatear fecha para HTML datetime-local
+      try {
+        const fechaObj = new Date(fecha_ultima_edicion);
+        const ahora = new Date();
+        // Si la fecha es inválida, usar la fecha actual
+        if (isNaN(fechaObj.getTime())) {
+          document.getElementById('relacionFechaUltimaEdicion').value = ahora.toISOString().slice(0, 16);
+        } else {
+          document.getElementById('relacionFechaUltimaEdicion').value = fechaObj.toISOString().slice(0, 16);
+        }
+      } catch (e) {
+        // Si hay error, usar la fecha actual
+        document.getElementById('relacionFechaUltimaEdicion').value = new Date().toISOString().slice(0, 16);
+      }
+      
+      // Inicializar y mostrar el modal
+      if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(document.getElementById('modalLocalEtiqueta'));
+      }
+      modalInstance.show();
+    }
+
+    document.getElementById('formLocalEtiqueta').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formMode = document.getElementById('formMode').value;
+      const id_local = document.getElementById('relacionIdLocalInput').value;
+      const id_etiqueta = document.getElementById('relacionIdEtiquetaInput').value;
+      const estado = document.getElementById('relacionEstado').value;
+      const creado_por = document.getElementById('relacionCreadoPor').value;
+      const editado_por = document.getElementById('relacionEditor').value || null;
+      const fecha_ultima_edicion = new Date(document.getElementById('relacionFechaUltimaEdicion').value).toISOString();
+
+      try {
+        let url, method, data;
+        
+        if (formMode === 'create') {
+          // Crear nueva relación
+          url = 'http://localhost:3000/api/v1/local-etiqueta';
+          method = 'POST';
+          data = {
+            id_local: parseInt(id_local),
+            id_etiqueta: parseInt(id_etiqueta),
+            estado,
+            creado_por,
+            editado_por,
+            fecha_creacion: fecha_ultima_edicion,
+            fecha_ultima_edicion
+          };
+        } else {
+          // Actualizar relación existente
+          url = `http://localhost:3000/api/v1/local-etiqueta/${id_local}/${id_etiqueta}`;
+          method = 'PATCH';
+          data = {
+            estado,
+            editado_por,
+            fecha_ultima_edicion
+          };
+        }
+
+        console.log('Enviando datos:', JSON.stringify(data));
+        
+        const response = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Error al guardar la relación: ${JSON.stringify(errorData)}`);
+        }
+
+        alert('Relación guardada correctamente');
+        cargarLocalEtiqueta();
+        modalInstance.hide();
+      } catch (error) {
+        console.error('Error al guardar la relación:', error);
+        alert(`Error al guardar la relación: ${error.message}`);
+      }
+    });
+
+    async function eliminarRelacion(id_local, id_etiqueta) {
+      if (confirm(`¿Estás seguro de que deseas eliminar la relación con ID Local: ${id_local} e ID Etiqueta: ${id_etiqueta}?`)) {
+        try {
+          const response = await fetch(`http://localhost:3000/api/v1/local-etiqueta/${id_local}/${id_etiqueta}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error al eliminar la relación: ${JSON.stringify(errorData)}`);
+          }
+
+          alert('Relación eliminada correctamente');
+          cargarLocalEtiqueta();
+        } catch (error) {
+          console.error('Error al eliminar la relación:', error);
+          alert(`Error al eliminar la relación: ${error.message}`);
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarLocalEtiqueta();
+    });
   </script>
 </body>
 </html>
