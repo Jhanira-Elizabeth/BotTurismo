@@ -272,7 +272,7 @@
 
     async function cargarLocalEtiqueta() {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/local-etiqueta');
+        const response = await fetch('https://tursd.onrender.com/api/v1/local-etiqueta');
         const relaciones = await response.json();
         const tabla = document.getElementById('tablaLocalEtiqueta');
         tabla.innerHTML = '';
@@ -365,7 +365,7 @@
         
         if (formMode === 'create') {
           // Crear nueva relación
-          url = 'http://localhost:3000/api/v1/local-etiqueta';
+          url = 'https://tursd.onrender.com/api/v1/local-etiqueta';
           method = 'POST';
           data = {
             id_local: parseInt(id_local),
@@ -378,7 +378,7 @@
           };
         } else {
           // Actualizar relación existente
-          url = `http://localhost:3000/api/v1/local-etiqueta/${id_local}/${id_etiqueta}`;
+          url = `https://tursd.onrender.com/api/v1/local-etiqueta/${id_local}/${id_etiqueta}`;
           method = 'PATCH';
           data = {
             estado,
@@ -412,7 +412,7 @@
     async function eliminarRelacion(id_local, id_etiqueta) {
       if (confirm(`¿Estás seguro de que deseas eliminar la relación con ID Local: ${id_local} e ID Etiqueta: ${id_etiqueta}?`)) {
         try {
-          const response = await fetch(`http://localhost:3000/api/v1/local-etiqueta/${id_local}/${id_etiqueta}`, {
+          const response = await fetch(`https://tursd.onrender.com/api/v1/local-etiqueta/${id_local}/${id_etiqueta}`, {
             method: 'DELETE',
           });
 
