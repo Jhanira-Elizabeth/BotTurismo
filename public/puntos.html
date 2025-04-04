@@ -117,7 +117,7 @@
     // Función para cargar los datos de Puntos Turísticos
     async function cargarPuntos() {
   try {
-    const response = await fetch('https://tursd.com/api/v1/puntos');
+    const response = await fetch('https://tursd.onrender.com//api/v1/puntos');
     const puntos = await response.json();
 
     // Ordenar los puntos por ID de forma ascendente
@@ -199,8 +199,8 @@
 
       const method = puntoId ? 'PATCH' : 'POST';
       const url = puntoId
-        ? `https://tursd.com/api/v1/puntos/${puntoId}`
-        : `https://tursd.com/api/v1/puntos`;
+        ? `https://tursd.onrender.com//api/v1/puntos/${puntoId}`
+        : `https://tursd.onrender.com//api/v1/puntos`;
 
       try {
         const response = await fetch(url, {
@@ -227,7 +227,7 @@
     async function eliminar(id) {
       if (confirm('¿Estás seguro de que deseas eliminar este punto turístico?')) {
         try {
-          const response = await fetch(`https://tursd.com/api/v1/puntos/${id}`, {
+          const response = await fetch(`https://tursd.onrender.com//api/v1/puntos/${id}`, {
             method: 'DELETE',
           });
 
