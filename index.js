@@ -17,6 +17,7 @@ const corsOptions = {
 
 // Habilitar CORS con las opciones configuradas
 app.use(cors(corsOptions));
+app.use(cors());
 
 // Middleware para parsear JSON
 app.use(express.json());
@@ -51,6 +52,10 @@ app.get('/horarios', (req, res) => {
 });
 app.get('/local-etiqueta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'local_etiqueta.html'));
+});
+
+app.get('/api/v1/local-etiqueta', (req, res) => {
+  res.json({ message: 'CORS configurado correctamente' });
 });
 
 // Rutas de la API
