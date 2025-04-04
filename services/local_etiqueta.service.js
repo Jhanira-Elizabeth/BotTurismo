@@ -1,5 +1,5 @@
 const boom = require('@hapi/boom');
-const { sequelize } = require('./../libs/sequelize');
+const sequelize = require('../libs/sequelize');
 
 class LocalEtiquetaService {
   constructor() {}
@@ -8,7 +8,7 @@ class LocalEtiquetaService {
   async find() {
     try {
       const query = 'SELECT * FROM local_etiqueta';
-      const [data] = await sequelize.query(query);
+      const [data] = await sequelize.query(query); // Asegúrate de que sequelize esté definido
       return data;
     } catch (error) {
       console.error('Error al obtener las relaciones:', error.message);
