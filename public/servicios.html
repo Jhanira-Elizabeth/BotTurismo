@@ -112,7 +112,7 @@
     // Función para cargar los datos de Servicios Locales
     async function cargarServicios() {
       try {
-        const response = await fetch('http://tursd-api.onrender.com/api/v1/servicios');
+        const response = await fetch('https://tursd-api.onrender.com/api/v1/servicios');
         if (!response.ok) {
           throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
         }
@@ -201,8 +201,8 @@
 
       const method = servicioId ? 'PATCH' : 'POST';
       const url = servicioId
-        ? `http://tursd-api.onrender.com/api/v1/servicios/${servicioId}`
-        : `http://tursd-api.onrender.com/api/v1/servicios`;
+        ? `https://tursd-api.onrender.com/api/v1/servicios/${servicioId}`
+        : `https://tursd-api.onrender.com/api/v1/servicios`;
 
       try {
         const response = await fetch(url, {
@@ -229,7 +229,7 @@
     async function eliminar(id) {
       if (confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
         try {
-          const response = await fetch(`http://tursd-api.onrender.com/api/v1/servicios/${id}`, {
+          const response = await fetch(`https://tursd-api.onrender.com/api/v1/servicios/${id}`, {
             method: 'DELETE',
           });
 

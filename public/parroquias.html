@@ -117,7 +117,7 @@
     // Función para cargar los datos de Parroquias
     async function cargarParroquias() {
       try {
-        const response = await fetch('http://tursd-api.onrender.com/api/v1/parroquias');
+        const response = await fetch('https://tursd-api.onrender.com/api/v1/parroquias');
         const parroquias = await response.json();
 
         const tabla = document.getElementById('tablaParroquias');
@@ -196,8 +196,8 @@
 
       const method = parroquiaId ? 'PATCH' : 'POST';
       const url = parroquiaId
-        ? `http://tursd-api.onrender.com/api/v1/parroquias/${parroquiaId}`
-        : `http://tursd-api.onrender.com/api/v1/parroquias`;
+        ? `https://tursd-api.onrender.com/api/v1/parroquias/${parroquiaId}`
+        : `https://tursd-api.onrender.com/api/v1/parroquias`;
 
       try {
         const response = await fetch(url, {
@@ -224,7 +224,7 @@
     async function eliminar(id) {
       if (confirm('¿Estás seguro de que deseas eliminar esta parroquia?')) {
         try {
-          const response = await fetch(`http://tursd-api.onrender.com/api/v1/parroquias/${id}`, {
+          const response = await fetch(`https://tursd-api.onrender.com/api/v1/parroquias/${id}`, {
             method: 'DELETE',
           });
 
