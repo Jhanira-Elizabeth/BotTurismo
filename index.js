@@ -6,23 +6,14 @@ const path = require('path'); // Importar path para manejar rutas de archivos
 const { logErrors, errorHandler, boomErrorHandler } = require('./middlewares/error.handler');
 const cors = require('cors'); // Importar cors para habilitar CORS
 
-
-app.use(express.json());
-
-const corsOptions = {
-  origin: ['https://tursd.onrender.com', 'http://localhost:3000'], // Permitir múltiples orígenes
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
+// Permitir todos los orígenes
+app.use(cors());
 
 // Middleware para parsear JSON
 app.use(express.json());
 
 // Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.get('/locales', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'locales.html'));
@@ -52,20 +43,18 @@ app.get('/local-etiqueta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'local_etiqueta.html'));
 });
 
-
-
 // Rutas de la API
 routerApi(app); // Aquí se agregan las rutas de la API (por ejemplo, productos)
+
 // Manejo de errores
 app.use(logErrors);
 app.use(boomErrorHandler);
 app.use(errorHandler);
-
 
 app.get('/', (req, res) => {
   res.send('Hola servidor de express');
 });
 
 app.listen(port, () => {
-  console.log('Mi puerto' + port);
+  console.log('Mi puerto ' + port);
 });
