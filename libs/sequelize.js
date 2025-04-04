@@ -1,13 +1,13 @@
 const { Sequelize } = require('sequelize');
-const { config } = require('./../config/config');
 
-const USER = encodeURIComponent(config.dbUser);
-const PASS = encodeURIComponent(config.dbPass);
-const URI = `postgres://${USER}:${PASS}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
-
-const sequelize = new Sequelize(URI, {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
-  logging: true, // Cambia a false si no quieres ver los logs de las consultas SQL
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Necesario para Render
+    },
+  },
 });
 
-module.exports = { sequelize }; // Exporta como un objeto
+module.exports = sequelize;
