@@ -271,32 +271,38 @@
     let modalInstance;
 
     async function cargarLocalEtiqueta() {
-      try {
-        const response = await fetch('https://tursd.onrender.com/api/v1/local-etiqueta');
-        const relaciones = await response.json();
-        const tabla = document.getElementById('tablaLocalEtiqueta');
-        tabla.innerHTML = '';
-        relaciones.forEach((relacion) => {
-          const fila = `
-            <tr>
-              <td>${relacion.id_local}</td>
-              <td>${relacion.id_etiqueta}</td>
-              <td>${relacion.estado}</td>
-              <td>${relacion.creado_por}</td>
-              <td>${new Date(relacion.fecha_creacion).toLocaleString()}</td>
-              <td>
-                <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${relacion.id_local}, ${relacion.id_etiqueta}, '${relacion.estado}', '${relacion.creado_por || ''}', '${relacion.editado_por || ''}', '${relacion.fecha_ultima_edicion}')">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="eliminarRelacion(${relacion.id_local}, ${relacion.id_etiqueta})">Eliminar</button>
-              </td>
-            </tr>
-          `;
-          tabla.innerHTML += fila;
-        });
-      } catch (error) {
-        console.error('Error al cargar las relaciones:', error);
-        alert('Error al cargar las relaciones. Revisa la consola para más detalles.');
-      }
+  try {
+    const response = await fetch('https://tursd.onrender.com/api/v1/local-etiqueta');
+    const relaciones = await response.json();
+    console.log('Respuesta de la API:', relaciones); // Verifica qué devuelve la API
+    const tabla = document.getElementById('tablaLocalEtiqueta');
+    tabla.innerHTML = '';
+    if (Array.isArray(relaciones)) {
+      relaciones.forEach((relacion) => {
+        const fila = `
+          <tr>
+            <td>${relacion.id_local}</td>
+            <td>${relacion.id_etiqueta}</td>
+            <td>${relacion.estado}</td>
+            <td>${relacion.creado_por}</td>
+            <td>${new Date(relacion.fecha_creacion).toLocaleString()}</td>
+            <td>
+              <button class="btn btn-primary btn-sm" onclick="abrirFormularioEditar(${relacion.id_local}, ${relacion.id_etiqueta}, '${relacion.estado}', '${relacion.creado_por || ''}', '${relacion.editado_por || ''}', '${relacion.fecha_ultima_edicion}')">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="eliminarRelacion(${relacion.id_local}, ${relacion.id_etiqueta})">Eliminar</button>
+            </td>
+          </tr>
+        `;
+        tabla.innerHTML += fila;
+      });
+    } else {
+      console.error('La respuesta no es un arreglo:', relaciones);
+      alert('Error: La respuesta de la API no es válida.');
     }
+  } catch (error) {
+    console.error('Error al cargar las relaciones:', error);
+    alert('Error al cargar las relaciones. Revisa la consola para más detalles.');
+  }
+}
 
     function abrirFormularioCrear() {
       document.getElementById('formLocalEtiqueta').reset();
