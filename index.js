@@ -6,6 +6,7 @@ const path = require('path'); // Importar path para manejar rutas de archivos
 const { logErrors, errorHandler, boomErrorHandler } = require('./middlewares/error.handler');
 const cors = require('cors'); // Importar cors para habilitar CORS
 
+
 // Permitir todos los orígenes
 app.use(cors());
 
