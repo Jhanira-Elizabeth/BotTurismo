@@ -1,11 +1,13 @@
 const { Pool } = require('pg');
-const { config } = require('./../config/config');
-const USER = encodeURIComponent(config.dbUser);
-const PASS = encodeURIComponent(config.dbPass);
-const URI = `postgres://${USER}:${PASS}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
-
 const pool = new Pool({
-  connectionString: URI,
+  host: 'tursd.postgres.database.azure.com',
+  user: 'tursd',
+  password: 'elizabeth18.',
+  database: 'tursd',
+  port: 5432,
+  ssl: { rejectUnauthorized: false }
 });
 
-module.exports = pool;
+async function getConnection() {
+  return await pool.connect();
+}
