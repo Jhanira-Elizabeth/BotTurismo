@@ -1,4 +1,3 @@
-require('dotenv').config(); // Carga las variables de entorno desde .env
 const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
@@ -6,9 +5,10 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, 
-    },
+      rejectUnauthorized: false
+    }
   },
+  logging: false // Desactiva logs innecesarios en producción
 });
 
 module.exports = sequelize;
