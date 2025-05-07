@@ -1,0 +1,56 @@
+<div class="modal fade show" tabindex="-1" style="display: block;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ actividad ? 'Editar Actividad' : 'Crear Actividad' }}</h5>
+          <button type="button" class="btn-close" (click)="onCerrar()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="actividadForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="id_punto_turistico" class="form-label">ID Punto Turístico</label>
+              <input type="number" class="form-control" id="id_punto_turistico" formControlName="id_punto_turistico" required>
+            </div>
+            <div class="mb-3">
+              <label for="actividad" class="form-label">Actividad</label>
+              <input type="text" class="form-control" id="actividad" formControlName="actividad" required>
+            </div>
+            <div class="mb-3">
+              <label for="precio" class="form-label">Precio</label>
+              <input type="number" class="form-control" id="precio" formControlName="precio">
+            </div>
+            <div class="mb-3">
+              <label for="estado" class="form-label">Estado</label>
+              <select class="form-select" id="estado" formControlName="estado" required>
+                <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="creado_por" class="form-label">Creado Por</label>
+              <input type="text" class="form-control" id="creado_por" formControlName="creado_por">
+            </div>
+            <div class="mb-3">
+              <label for="editado_por" class="form-label">Editado Por</label>
+              <input type="text" class="form-control" id="editado_por" formControlName="editado_por">
+            </div>
+            <div class="mb-3">
+              <label for="fecha_creacion" class="form-label">Fecha Creación</label>
+              <input type="datetime-local" class="form-control" id="fecha_creacion" formControlName="fecha_creacion">
+            </div>
+            <div class="mb-3">
+              <label for="fecha_ultima_edicion" class="form-label">Fecha Última Edición</label>
+              <input type="datetime-local" class="form-control" id="fecha_ultima_edicion" formControlName="fecha_ultima_edicion">
+            </div>
+            <div class="mb-3">
+              <label for="tipo" class="form-label">Tipo</label>
+              <input type="text" class="form-control" id="tipo" formControlName="tipo">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="onCerrar()">Cancelar</button>
+              <button type="submit" class="btn btn-primary">{{ actividad ? 'Guardar Cambios' : 'Crear Actividad' }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

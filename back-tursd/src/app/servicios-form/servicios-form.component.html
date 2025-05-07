@@ -1,0 +1,57 @@
+<div class="modal fade show" tabindex="-1" style="display: block;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ servicio ? 'Editar Servicio' : 'Crear Servicio' }}</h5>
+          <button type="button" class="btn-close" (click)="onCerrar()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="servicioForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="id_local" class="form-label">ID Local</label>
+              <input type="number" class="form-control" id="id_local" formControlName="id_local" required>
+            </div>
+            <div class="mb-3">
+              <label for="servicio" class="form-label">Servicio</label>
+              <input type="text" class="form-control" id="servicio" formControlName="servicio" required>
+          </div>
+          <div class="mb-3">
+            <label for="precio" class="form-label">Precio</label>
+            <input type="number" class="form-control" id="precio" formControlName="precio" required>
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <input type="text" class="form-control" id="tipo" formControlName="tipo" required>
+          </div>
+          <div class="mb-3">
+            <label for="estado" class="form-label">Estado</label>
+            <select class="form-select" id="estado" formControlName="estado" required>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="creado_por" class="form-label">Creado Por</label>
+            <input type="text" class="form-control" id="creado_por" formControlName="creado_por">
+          </div>
+          <div class="mb-3">
+            <label for="editado_por" class="form-label">Editado Por</label>
+            <input type="text" class="form-control" id="editado_por" formControlName="editado_por">
+          </div>
+          <div class="mb-3">
+            <label for="fecha_creacion" class="form-label">Fecha Creación</label>
+            <input type="datetime-local" class="form-control" id="fecha_creacion" formControlName="fecha_creacion">
+          </div>
+          <div class="mb-3">
+            <label for="fecha_ultima_edicion" class="form-label">Fecha Última Edición</label>
+            <input type="datetime-local" class="form-control" id="fecha_ultima_edicion" formControlName="fecha_ultima_edicion">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="onCerrar()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">{{ servicio ? 'Guardar Cambios' : 'Crear Servicio' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 const express = require('express'); // Importar express
 const app = express(); // Asignar express a mi aplicación
-const port = 3000; // Asignación puerto donde se ejecutará el proy
+const port = process.env.PORT || 3000; // Usar el puerto proporcionado por Azure, o el 3000 si está en local
+ // Asignación puerto donde se ejecutará el proy
 const routerApi = require('./routes'); // Importar las rutas
 const path = require('path'); // Importar path para manejar rutas de archivos
 const { logErrors, errorHandler, boomErrorHandler } = require('./middlewares/error.handler');
