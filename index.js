@@ -1,62 +1,28 @@
-const express = require('express'); // Importar express
-const app = express(); // Asignar express a mi aplicación
-const port = process.env.PORT || 3000; // Usar el puerto proporcionado por Azure, o el 3000 si está en local
- // Asignación puerto donde se ejecutará el proy
-const routerApi = require('./routes'); // Importar las rutas
-const path = require('path'); // Importar path para manejar rutas de archivos
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+const routerApi = require('./routes'); // Importa tus rutas de API
+const cors = require('cors');
 const { logErrors, errorHandler, boomErrorHandler } = require('./middlewares/error.handler');
-const cors = require('cors'); // Importar cors para habilitar CORS
 
-
-// Permitir todos los orígenes
+// Habilitar CORS (puedes especificar orígenes más restrictivos en producción)
 app.use(cors());
 
-// Middleware para parsear JSON
+// Middleware para parsear JSON en las peticiones
 app.use(express.json());
 
-// Servir archivos estáticos desde la carpeta 'public'
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/locales', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'locales.html'));
-});
-app.get('/puntos', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'puntos.html'));
-});
-app.get('/etiquetas', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'etiquetas.html'));
-});
-app.get('/actividades', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'actividades.html'));
-});
-app.get('/duenos', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'duenos.html'));
-});
-app.get('/parroquias', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'parroquias.html'));
-});
-app.get('/servicios', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'servicios.html'));
-});
-app.get('/horarios', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'horarios.html'));
-});
-app.get('/local-etiqueta', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'local_etiqueta.html'));
-});
-
 // Rutas de la API
-routerApi(app); // Aquí se agregan las rutas de la API (por ejemplo, productos)
+routerApi(app); // Aquí se montan todas tus rutas de la API
 
-// Manejo de errores
+// Middleware de manejo de errores (el orden es importante)
 app.use(logErrors);
 app.use(boomErrorHandler);
 app.use(errorHandler);
 
 app.get('/', (req, res) => {
-  res.send('Hola servidor de express');
+  res.send('API del backend de Tursd está funcionando!');
 });
 
 app.listen(port, () => {
-  console.log('Mi puerto ' + port);
+  console.log('Servidor backend escuchando en el puerto ' + port);
 });

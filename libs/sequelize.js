@@ -1,10 +1,12 @@
 const { Sequelize } = require('sequelize');
 const { config } = require('../config/config.js');
 
-const DATABASE_URL = `postgresql://${config.dbUser}:${config.dbPass}@${config.dbHost}:${config.dbPort}/${config.dbName}?sslmode=require`;
-
-
-const sequelize = new Sequelize(DATABASE_URL, {
+const sequelize = new Sequelize({
+  database: config.dbName,
+  username: config.dbUser,
+  password: config.dbPass,
+  host: config.dbHost,
+  port: config.dbPort,
   dialect: 'postgres',
   dialectOptions: {
     ssl: {
@@ -12,7 +14,7 @@ const sequelize = new Sequelize(DATABASE_URL, {
       rejectUnauthorized: false,
     },
   },
-  logging: false, // Desactiva logs innecesarios en producción
+  logging: false,
 });
 
 module.exports = sequelize;
