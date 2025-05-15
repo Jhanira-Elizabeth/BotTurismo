@@ -7,7 +7,7 @@ class PuntoEtiquetaService {
   // Obtener todas las relaciones
   async find() {
     try {
-      const query = 'SELECT * FROM punto_etiqueta';
+      const query = 'SELECT * FROM puntos_turisticos_etiqueta';
       const [data] = await sequelize.query(query);
       return data;
     } catch (error) {
@@ -20,7 +20,7 @@ class PuntoEtiquetaService {
   async findOne(id_punto_turistico, id_etiqueta) {
     try {
       const query = `
-        SELECT * FROM punto_etiqueta
+        SELECT * FROM puntos_turisticos_etiqueta
         WHERE id_punto_turistico = :id_punto_turistico AND id_etiqueta = :id_etiqueta
       `;
       const [data] = await sequelize.query(query, {
@@ -40,7 +40,7 @@ class PuntoEtiquetaService {
   async create(data) {
     try {
       const query = `
-        INSERT INTO punto_etiqueta (id_punto_turistico, id_etiqueta, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
+        INSERT INTO puntos_turisticos_etiqueta (id_punto_turistico, id_etiqueta, estado, creado_por, editado_por, fecha_creacion, fecha_ultima_edicion)
         VALUES (:id_punto_turistico, :id_etiqueta, :estado, :creado_por, :editado_por, :fecha_creacion, :fecha_ultima_edicion)
         RETURNING *;
       `;
@@ -61,7 +61,7 @@ class PuntoEtiquetaService {
   async update(id_punto_turistico, id_etiqueta, changes) {
     try {
       const query = `
-        UPDATE punto_etiqueta
+        UPDATE puntos_turisticos_etiqueta
         SET estado = :estado, editado_por = :editado_por, fecha_ultima_edicion = :fecha_ultima_edicion
         WHERE id_punto_turistico = :id_punto_turistico AND id_etiqueta = :id_etiqueta
         RETURNING *;
@@ -83,7 +83,7 @@ class PuntoEtiquetaService {
   async delete(id_punto_turistico, id_etiqueta) {
     try {
       const query = `
-        DELETE FROM punto_etiqueta
+        DELETE FROM puntos_turisticos_etiqueta
         WHERE id_punto_turistico = :id_punto_turistico AND id_etiqueta = :id_etiqueta
         RETURNING *;
       `;
