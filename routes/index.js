@@ -8,6 +8,7 @@ const serviciosRouter = require('./servicios_locales.router');
 const duenosRouter = require('./duenos_locales.router');
 const parroquiasRouter = require('./parroquias.router');
 const horariosRouter = require('./horarios_atencion.router');
+const puntoEtiquetaRouter = require('./puntos_etiquetas.router');
 
 function routerApi(app) {
   const router = express.Router();
@@ -22,6 +23,7 @@ function routerApi(app) {
   router.use('/duenos', duenosRouter);
   router.use('/parroquias', parroquiasRouter);
   router.use('/horarios', horariosRouter);
+  router.use('/punto-etiqueta', puntoEtiquetaRouter);
 }
 
 module.exports = routerApi;
