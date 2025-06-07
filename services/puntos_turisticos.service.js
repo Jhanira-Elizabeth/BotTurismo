@@ -66,6 +66,32 @@ class PuntosService {
     }
     return { id: result[0].id };
   }
+
+  async findAll(query) {
+  const { id_etiqueta } = query;
+
+  const where = { estado: true };
+
+  let include = [];
+
+  if (id_etiqueta) {
+    include.push({
+      model: PuntoEtiquetaModel,
+      as: 'etiquetas',
+      where: { id_etiqueta, estado: true },
+    });
+  }
+
+  const data = await this.model.findAll({
+    where,
+    include,
+  });
+
+  return data;
 }
+
+}
+
+
 
 module.exports = PuntosService;

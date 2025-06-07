@@ -11,10 +11,10 @@ const router = express.Router();
 const service = new PuntoEtiquetaService();
 
 // Obtener todas las relaciones
-router.get('/', async (req, res, next) => {
+router.get('/filtro', async (req, res, next) => {
   try {
-    const relaciones = await service.find();
-    res.json(relaciones);
+    const puntos = await service.findAll(req.query); // ej. /filtro?id_etiqueta=2
+    res.json(puntos);
   } catch (error) {
     next(error);
   }
