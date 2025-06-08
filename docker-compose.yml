@@ -1,10 +1,8 @@
 version: "3.3"
 
-# docker-compose.yml
 services:
   pg_tursd:
     image: postgres:17
-    # Nombre para el hotnsme/address
     container_name: pg_tursd
     ports:
       - "5432:5432"
@@ -12,7 +10,7 @@ services:
       POSTGRES_USER: tursd
       POSTGRES_PASSWORD: tursd
       POSTGRES_DB: tursd
-      POSTGRES_HOST_AUTH_METHOD: md5 
+      POSTGRES_HOST_AUTH_METHOD: trust # Permite conexiones sin contraseña para todas las IPs al iniciar
     volumes:
       - pg_data:/var/lib/postgresql/data
       - ./db_init:/docker-entrypoint-initdb.d/
@@ -21,6 +19,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    command: postgres -c 'listen_addresses=*' # Comando simplificado, sin reglas de host específicas aquí
 
   pgadmin_tursd:
     image: dpage/pgadmin4
@@ -34,7 +33,6 @@ services:
       pg_tursd:
         condition: service_healthy
 
-  # ¡NUEVO SERVICIO PARA TU APLICACIÓN BACKEND!
   backend_app:
     build: . # Docker buscará el Dockerfile en el directorio actual (donde está docker-compose.yml)
     container_name: tursd_backend_app
@@ -51,5 +49,5 @@ services:
       pg_tursd:
         condition: service_healthy # Asegura que la DB esté lista antes de iniciar el backend
 
-volumes:
+volumes: # Este es el ÚNICO lugar donde debe estar esta sección
   pg_data:

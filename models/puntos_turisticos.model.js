@@ -16,9 +16,6 @@ class PuntosTuristicos extends Model {
         descripcion: {
           type: DataTypes.TEXT,
         },
-        direccion: {
-          type: DataTypes.TEXT,
-        },
         latitud: {
           type: DataTypes.FLOAT,
         },

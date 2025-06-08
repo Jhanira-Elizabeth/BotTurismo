@@ -13,7 +13,7 @@ class ServiciosLocales extends Model {
           type: DataTypes.INTEGER,
           allowNull: false,
         },
-        nombre: {
+        servicio: {
           type: DataTypes.STRING,
           allowNull: false,
         },
@@ -21,7 +21,7 @@ class ServiciosLocales extends Model {
           type: DataTypes.FLOAT,
           allowNull: false,
         },
-        categoria: {
+        tipo: {
           type: DataTypes.STRING,
           allowNull: false,
         },

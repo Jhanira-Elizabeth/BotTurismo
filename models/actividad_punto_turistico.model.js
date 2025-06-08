@@ -9,11 +9,11 @@ class ActividadPuntoTuristico extends Model {
           autoIncrement: true,
           primaryKey: true,
         },
-        id_punto: {
+        id_punto_turistico: {
           type: DataTypes.INTEGER,
           allowNull: false,
         },
-        nombre: {
+        actividad: {
           type: DataTypes.STRING,
           allowNull: false,
         },
